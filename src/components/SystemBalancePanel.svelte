@@ -11,13 +11,13 @@
   const availableLinks = $derived(
     (status?.links ?? [])
       .filter((link) => link.enabled && link.state === "online")
-      .sort((left, right) => left.name.localeCompare(right.name, lang.current)),
+      .sort((left, right) => left.name.localeCompare(right.name, "en")),
   );
   // link presenti ma disattivati dall'utente: restano in elenco, attenuati e
   // con l'interruttore spento, così si possono riaccendere da qui
   const disabledLinks = $derived((status?.links ?? []).filter((link) => !link.enabled && link.state !== "offline"));
   const feedLinks = $derived(
-    [...availableLinks, ...disabledLinks].sort((left, right) => left.name.localeCompare(right.name, lang.current)),
+    [...availableLinks, ...disabledLinks].sort((left, right) => left.name.localeCompare(right.name, "en")),
   );
   // Velocità mostrate: traffico reale di ogni scheda, misurato dal monitor
   // sempre, dall'avvio, anche a tunnel fermo o con il link escluso. Il

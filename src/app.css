@@ -2,7 +2,8 @@
    Omni-Route Design System  —  Minimalist Warm-Gradient Dark Theme
    Accent palette: slate indigo + amber, no neon.
 ───────────────────────────────────────────────────────────────────────── */
-:root {
+:root,
+:root[data-theme="dark"] {
   color-scheme: dark;
 
   /* Surfaces: deep warm-slate, not blue-black */
@@ -113,6 +114,7 @@ html, body {
   font-size: 16px;
   font-feature-settings: "kern" 1, "liga" 1;
   text-rendering: optimizeLegibility;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
 button, input { font-family: inherit; }

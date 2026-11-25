@@ -5,7 +5,7 @@
   import { monitor, systemBalance } from "./lib/stores.svelte";
   import { doctorReport } from "./lib/ipc";
   import { formatMbps } from "./lib/format";
-  import "./lib/theme.svelte";
+  import { theme } from "./lib/theme.svelte";
   import "./lib/accent.svelte";
   import Gauge from "./components/Gauge.svelte";
   import LinkChip from "./components/LinkChip.svelte";
@@ -86,17 +86,17 @@
         <span class="status-dot"></span>
         <span class="state-text">{monitor.connected ? t("Monitor attivo") : t("Connessione al motore…")}</span>
       </span>
-      <div class="lang-switch" role="group" aria-label={t("Lingua")}>
-        {#each ["it", "en"] as code (code)}
-          <button
-            type="button"
-            class:active={lang.current === code}
-            aria-pressed={lang.current === code}
-            title={code === "it" ? t("Italiano") : t("English")}
-            onclick={() => lang.set(code as "it" | "en")}
-          >{code.toUpperCase()}</button>
-        {/each}
-      </div>
+      <button
+        class="icon-button theme-toggle"
+        type="button"
+        onclick={() => theme.toggle()}
+        title={theme.isDark ? "Switch to light theme" : "Switch to dark theme"}
+        aria-label={theme.isDark ? "Switch to light theme" : "Switch to dark theme"}
+      >
+        <span class="theme-icon" class:is-sun={!theme.isDark}>
+          <Icon name={theme.isDark ? "moon" : "sun"} size={16} />
+        </span>
+      </button>
       <button class="button quiet" type="button" onclick={() => (speedTestOpen = true)}>
         <Icon name="activity" size={15} /> {t("Diagnostica")}
       </button>
@@ -348,19 +348,7 @@
   .state-text { display: none; }
   @media (min-width: 760px) { .state-text { display: inline; } }
 
-  /* Lang switcher */
-  .lang-switch {
-    display: inline-flex; align-items: center; gap: 0;
-    border: 1px solid var(--border-strong); border-radius: 999px;
-    background: var(--surface-2); overflow: hidden;
-  }
-  .lang-switch button {
-    border: 0; padding: 0.18rem 0.5rem;
-    background: transparent; color: var(--text-muted);
-    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; cursor: pointer;
-    transition: background 120ms ease, color 120ms ease;
-  }
-  .lang-switch button.active { background: var(--accent); color: #0d0b18; }
+  
 
   /* ── Workspace ────────────────────────────────────────────────────── */
   .workspace {

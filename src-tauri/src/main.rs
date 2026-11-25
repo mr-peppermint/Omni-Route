@@ -118,12 +118,12 @@ async fn doctor_report() -> doctor::DoctorReport {
         Ok(Ok(report)) => report,
         Ok(Err(error)) => doctor::DoctorReport {
             links: Vec::new(),
-            warnings: vec![format!("Diagnostica interrotta: {error}")],
+            warnings: vec![format!("Diagnostics interrupted: {error}")],
         },
         Err(_) => doctor::DoctorReport {
             links: Vec::new(),
             warnings: vec![
-                "Diagnostica scaduta dopo 18 secondi. Il tunnel continua a funzionare; riprova dopo aver stabilizzato le connessioni.".into(),
+                "Diagnostics timed out after 18 seconds. The tunnel remains active; retry after stabilizing connections.".into(),
             ],
         },
     }
@@ -161,7 +161,7 @@ async fn start_download(
         tracing::warn!("{w}");
     }
     if candidates.is_empty() {
-        return Err("Nessun link con binding validato. Controlla la Diagnostica.".into());
+        return Err("No links with validated binding. Check Diagnostics.".into());
     }
 
     let settings = Settings::load(&state.settings_path)?;
@@ -190,7 +190,7 @@ async fn start_download(
     };
     if !links.iter().any(|link| link.enabled) {
         return Err(
-            "Nessuna connessione abilitata. Riattivane almeno una nelle Impostazioni prima di scaricare.".into(),
+            "No connections enabled. Re-enable at least one connection in Settings before downloading.".into(),
         );
     }
 
@@ -224,7 +224,7 @@ async fn start_download(
 #[tauri::command]
 fn pause_download(state: tauri::State<AppState>) -> Result<(), String> {
     let active = state.active_download.lock().unwrap();
-    let h = active.as_ref().ok_or("nessun download attivo")?;
+    let h = active.as_ref().ok_or("no active download")?;
     h.paused.store(true, Ordering::Relaxed);
     Ok(())
 }
@@ -232,7 +232,7 @@ fn pause_download(state: tauri::State<AppState>) -> Result<(), String> {
 #[tauri::command]
 fn resume_download(state: tauri::State<AppState>) -> Result<(), String> {
     let active = state.active_download.lock().unwrap();
-    let h = active.as_ref().ok_or("nessun download attivo")?;
+    let h = active.as_ref().ok_or("no active download")?;
     h.paused.store(false, Ordering::Relaxed);
     Ok(())
 }
@@ -240,7 +240,7 @@ fn resume_download(state: tauri::State<AppState>) -> Result<(), String> {
 #[tauri::command]
 fn cancel_download(state: tauri::State<AppState>) -> Result<(), String> {
     let active = state.active_download.lock().unwrap();
-    let h = active.as_ref().ok_or("nessun download attivo")?;
+    let h = active.as_ref().ok_or("no active download")?;
     h.cancelled.store(true, Ordering::Relaxed);
     Ok(())
 }
@@ -294,7 +294,7 @@ async fn set_link_enabled(
         if let Some(flag) = handle.link_enabled.get(&key) {
             flag.store(enabled, Ordering::Release);
             let action = if enabled { "riattivata" } else { "esclusa" };
-            core::events::push("info", format!("Connessione {action} durante il download"));
+            core::events::push("info", format!("Connection {action} during download"));
         }
     }
     // Le due modalità condividono la stessa preferenza: una modifica
@@ -451,7 +451,7 @@ fn main() {
             // primaria, la tray è solo un accesso rapido in più.
             if let Some(icon) = app.default_window_icon().cloned() {
                 let tray_menu = tauri::menu::MenuBuilder::new(app)
-                    .text("show", "Apri / Open Omni-Route")
+                    .text("show", "Open Omni-Route")
                     .separator()
                     .text("quit", "Esci / Quit")
                     .build()?;

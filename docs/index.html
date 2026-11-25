@@ -40,7 +40,7 @@
       "processorRequirements": "x64",
       "softwareVersion": "1.0.0",
       "datePublished": "2026-10-14",
-      "inLanguage": ["en", "it"],
+      "inLanguage": ["en"],
       "downloadUrl": "https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe",
       "installUrl": "https://github.com/mr-peppermint/Omni-Route/releases/latest",
       "image": "https://mr-peppermint.github.io/Omni-Route/images/logo.png",
@@ -113,16 +113,6 @@
   a { color:inherit; text-decoration:none; }
   :focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:8px; }
   .wrap { width:min(1120px,100% - 2*var(--gutter)); margin-inline:auto; }
-
-  /* ---------- language switching ---------- */
-  [data-lang] { display:none !important; }
-  html[lang="en"] [data-lang="en"], html[lang="it"] [data-lang="it"] { display:revert !important; }
-  html[lang="en"] span[data-lang="en"], html[lang="it"] span[data-lang="it"] { display:inline !important; }
-
-  html[lang="en"] .strip span[data-lang="en"], html[lang="it"] .strip span[data-lang="it"],
-  html[lang="en"] .node span[data-lang="en"], html[lang="it"] .node span[data-lang="it"],
-  html[lang="en"] .strip b[data-lang="en"], html[lang="it"] .strip b[data-lang="it"],
-  html[lang="en"] .node b[data-lang="en"], html[lang="it"] .node b[data-lang="it"] { display:block !important; }
 
   /* ---------- buttons ---------- */
   .btn { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; min-height:44px; padding:.7rem 1.25rem; border-radius:var(--radius-sm); font-weight:650; font-size:.95rem; border:1px solid transparent; cursor:pointer; transition:transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease; white-space:nowrap; }
@@ -272,21 +262,18 @@
     <nav aria-label="Main">
       <a class="brand" href="#top"><img src="images/logo.png" alt=""> Omni-Route</a>
       <div class="links">
-        <a href="#use-cases"><span data-lang="en">Use cases</span><span data-lang="it">Casi d'uso</span></a>
-        <a href="#how"><span data-lang="en">How it works</span><span data-lang="it">Come funziona</span></a>
+        <a href="#use-cases">Use cases</a>
+        <a href="#how">How it works</a>
         <a href="#faq">FAQ</a>
       </div>
       <span class="spacer"></span>
-      <div class="lang" role="group" aria-label="Language">
-        <button type="button" data-set="en" class="on">EN</button><button type="button" data-set="it">IT</button>
-      </div>
       <a class="btn ghost" href="https://github.com/mr-peppermint/Omni-Route" aria-label="GitHub">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
         <span class="lbl">GitHub</span>
       </a>
       <a class="btn primary" href="https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe" aria-label="Download">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
-        <span class="lbl"><span data-lang="en">Download</span><span data-lang="it">Scarica</span></span>
+        <span class="lbl">Download</span>
       </a>
     </nav>
   </div>
@@ -298,39 +285,39 @@
   <!-- ===================== HERO ===================== -->
   <div class="hero">
     <span class="pill"><i></i>
-      <span data-lang="en">Free · Public source code · Windows 10 &amp; 11</span>
-      <span data-lang="it">Gratis · Codice pubblico · Windows 10 e 11</span></span>
+      Free · Public source code · Windows 10 &amp; 11
+      </span>
 
     <h1>
-      <span data-lang="en">All your connections.<br><span class="grad">Combined into one.</span></span>
-      <span data-lang="it">Tutte le tue connessioni.<br><span class="grad">Sommate in una.</span></span>
+      All your connections.<br><span class="grad">Combined into one.</span>
+      </span>
     </h1>
-    <p class="lead" data-lang="en">Plug in a phone. Join a Wi-Fi. Omni-Route adds them together.</p>
-    <p class="lead" data-lang="it">Collega un telefono. Unisciti a un Wi-Fi. Omni-Route le somma.</p>
+    Plug in a phone. Join a Wi-Fi. Omni-Route adds them together.
+    
 
     <!-- the two headline use cases -->
     <div class="use2">
       <article class="use slow">
-        <h2 data-lang="en">🐢 Slow or unstable internet?</h2><h2 data-lang="it">🐢 Internet lento o instabile?</h2>
-        <p data-lang="en">Gather every connection within reach — phones, even a weak Wi-Fi — and let them work as one. If one drops, the others keep you online.</p>
-        <p data-lang="it">Raccogli tutte le connessioni a portata — telefoni, anche un Wi-Fi debole — e falle lavorare come una. Se una cade, le altre ti tengono online.</p>
+        🐢 Slow or unstable internet?
+        Gather every connection within reach — phones, even a weak Wi-Fi — and let them work as one. If one drops, the others keep you online.
+        
         <div class="calc">
-          <span class="chip" data-lang="en">📶 Weak Wi-Fi 12 Mbps</span><span class="chip" data-lang="it">📶 Wi-Fi debole 12 Mbps</span>
+          📶 Weak Wi-Fi 12 Mbps
           <span class="op">+</span><span class="chip">📱 25 Mbps</span><span class="op">+</span><span class="chip">📱 18 Mbps</span><span class="op">=</span>
           <span class="total">55 Mbps</span>
         </div>
       </article>
       <article class="use fast">
-        <h2 data-lang="en">🚀 Want more bandwidth?</h2><h2 data-lang="it">🚀 Vuoi più banda?</h2>
-        <p data-lang="en">A fast cable, a fast Wi-Fi and a phone on USB can all pull at once, well beyond what any single one delivers.</p>
-        <p data-lang="it">Cavo veloce, Wi-Fi veloce e un telefono in USB tirano tutti insieme, ben oltre quello che dà ciascuno da solo.</p>
+        🚀 Want more bandwidth?
+        A fast cable, a fast Wi-Fi and a phone on USB can all pull at once, well beyond what any single one delivers.
+        
         <div class="calc">
-          <span class="chip" data-lang="en">🔌 Cable 1 Gbps</span><span class="chip" data-lang="it">🔌 Cavo 1 Gbps</span>
+          🔌 Cable 1 Gbps
           <span class="op">+</span><span class="chip">📶 Wi-Fi 700 Mbps</span><span class="op">+</span><span class="chip">📱 USB 600 Mbps</span><span class="op">=</span>
           <span class="total">2.3 Gbps 🚀</span>
         </div>
-        <small data-lang="en">The speeds add up: the more connections you add, the more bandwidth you get. The real result depends on the website, your router and your disk.</small>
-        <small data-lang="it">Le velocità si sommano: più connessioni aggiungi, più banda ottieni. Il risultato reale dipende da sito, router e disco.</small>
+        The speeds add up: the more connections you add, the more bandwidth you get. The real result depends on the website, your router and your disk.
+        
       </article>
     </div>
 
@@ -340,19 +327,19 @@
       <div class="dl-row">
         <a class="btn primary lg" href="https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
-          <span data-lang="en">Download installer</span><span data-lang="it">Scarica l'installer</span>
+          Download installer
         </a>
         <a class="btn ghost lg" href="https://github.com/mr-peppermint/Omni-Route">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
-          <span data-lang="en">View on GitHub</span><span data-lang="it">Vedi su GitHub</span>
+          View on GitHub
         </a>
       </div>
       <p class="note" style="margin-top:.9rem">Windows 10 · 11 · x64</p>
       <div class="cmd">
         <code id="cmd"><b>$</b>powershell -ep bypass -c "irm https://raw.githubusercontent.com/mr-peppermint/Omni-Route/main/install.ps1|iex"</code>
-        <button class="copy" id="copy" type="button"><span data-lang="en">Copy</span><span data-lang="it">Copia</span></button>
+        <button class="copy" id="copy" type="button">Copy</button>
       </div>
-      <p class="note"><span data-lang="en">From cmd or PowerShell · Free · No account</span><span data-lang="it">Da cmd o PowerShell · Gratis · Nessun account</span></p>
+      <p class="note">From cmd or PowerShell · Free · No account</p>
     </div>
 
     <figure class="shot" style="margin-inline:auto">
@@ -360,130 +347,130 @@
         <div class="bar"><i></i><i></i><i></i></div>
         <img src="images/dashboard-en.png" id="shot" width="1820" height="1295" alt="Omni-Route showing the combined speed and each connection's speed">
       </div>
-      <figcaption data-lang="en">Each connection has its own small dial; the dashed lines show them flowing into the big one — your total speed. (Illustration with simulated data.)</figcaption>
-      <figcaption data-lang="it">Ogni connessione ha il suo piccolo quadrante; le linee tratteggiate mostrano come confluiscono in quello grande — la velocità totale. (Illustrazione con dati simulati.)</figcaption>
+      Each connection has its own small dial; the dashed lines show them flowing into the big one — your total speed. (Illustration with simulated data.)
+      
     </figure>
 
     <div class="strip" role="list">
-      <div role="listitem"><b data-lang="en">No server, no cloud</b><b data-lang="it">Nessun server, nessun cloud</b><span data-lang="en">Everything runs on your PC.</span><span data-lang="it">Tutto gira sul tuo PC.</span></div>
-      <div role="listitem"><b data-lang="en">No account</b><b data-lang="it">Nessun account</b><span data-lang="en">Install and use. Nothing to sign up for.</span><span data-lang="it">Installi e usi. Niente registrazioni.</span></div>
-      <div role="listitem"><b>Hot-plug</b><span data-lang="en">Plug in a phone and it joins in seconds.</span><span data-lang="it">Colleghi un telefono e si aggiunge in pochi secondi.</span></div>
-      <div role="listitem"><b data-lang="en">Public source code</b><b data-lang="it">Codice pubblico</b><span data-lang="en">Read it, build it, use it — even at work.</span><span data-lang="it">Lo leggi, lo compili, lo usi — anche al lavoro.</span></div>
+      <div role="listitem">No server, no cloudEverything runs on your PC.</div>
+      <div role="listitem">No accountInstall and use. Nothing to sign up for.</div>
+      <div role="listitem"><b>Hot-plug</b>Plug in a phone and it joins in seconds.</div>
+      <div role="listitem">Public source codeRead it, build it, use it — even at work.</div>
     </div>
   </div>
 
   <!-- ===================== THREE STEPS ===================== -->
   <section id="steps">
-    <span class="eyebrow" data-lang="en">Simple</span><span class="eyebrow" data-lang="it">Semplice</span>
-    <h2 class="title" data-lang="en">Three steps. That's it.</h2><h2 class="title" data-lang="it">Tre passi. Tutto qui.</h2>
+    Simple
+    Three steps. That's it.
     <div class="grid3">
       <div class="card"><span class="n">1</span>
-        <h3 data-lang="en">Connect what you have</h3><h3 data-lang="it">Collega quello che hai</h3>
-        <p data-lang="en">A USB cable with tethering on, a phone hotspot, or another Wi-Fi. As many as you like.</p>
-        <p data-lang="it">Cavo USB con tethering, hotspot del telefono o un altro Wi-Fi. Quanti ne vuoi.</p></div>
+        Connect what you have
+        A USB cable with tethering on, a phone hotspot, or another Wi-Fi. As many as you like.
+        </div>
       <div class="card"><span class="n">2</span>
-        <h3 data-lang="en">Flip the switch</h3><h3 data-lang="it">Accendi l'interruttore</h3>
-        <p data-lang="en">Open Omni-Route and turn on the big switch.</p><p data-lang="it">Apri Omni-Route e attiva l'interruttore grande.</p></div>
+        Flip the switch
+        Open Omni-Route and turn on the big switch.</div>
       <div class="card"><span class="n">3</span>
-        <h3 data-lang="en">Watch it add up</h3><h3 data-lang="it">Guardalo sommarsi</h3>
-        <p data-lang="en">One dial for the total, small dials for each connection. Plug one in, it joins. Unplug it, everything carries on.</p>
-        <p data-lang="it">Un quadrante per il totale, uno piccolo per ogni connessione. Ne colleghi una, si aggiunge. La scolleghi, tutto continua.</p></div>
+        Watch it add up
+        One dial for the total, small dials for each connection. Plug one in, it joins. Unplug it, everything carries on.
+        </div>
     </div>
   </section>
 
   <!-- ===================== USE CASES ===================== -->
   <section id="use-cases">
-    <span class="eyebrow" data-lang="en">Use cases</span><span class="eyebrow" data-lang="it">Casi d'uso</span>
-    <h2 class="title" data-lang="en">When it helps</h2><h2 class="title" data-lang="it">Quando serve</h2>
+    Use cases
+    When it helps
     <div class="grid3">
-      <div class="card"><div class="ico">📥</div><h3 data-lang="en">Big downloads</h3><h3 data-lang="it">Download grossi</h3>
-        <p data-lang="en">Games, films, updates. The file is split in pieces, each one arriving over a different connection.</p>
-        <p data-lang="it">Giochi, film, aggiornamenti. Il file viene diviso in pezzi, ognuno porta da una connessione diversa.</p></div>
-      <div class="card"><div class="ico">📞</div><h3 data-lang="en">Smooth video calls</h3><h3 data-lang="it">Videochiamate fluide</h3>
-        <p data-lang="en">More connections share the load, so nothing steps on your call.</p>
-        <p data-lang="it">Più connessioni si dividono il lavoro, così niente disturba la chiamata.</p></div>
-      <div class="card"><div class="ico">💼</div><h3 data-lang="en">Working from anywhere</h3><h3 data-lang="it">Lavorare ovunque</h3>
-        <p data-lang="en">Holiday house, campsite, train, shared flat: combine what's around you into a connection you can work on.</p>
-        <p data-lang="it">Casa vacanze, campeggio, treno, appartamento condiviso: metti insieme quello che c'è in una connessione su cui lavorare.</p></div>
-      <div class="card"><div class="ico">📱</div><h3 data-lang="en">Limited mobile data</h3><h3 data-lang="it">Dati mobili limitati</h3>
-        <p data-lang="en">Mark a phone as metered and Omni-Route uses it only when it truly helps.</p>
-        <p data-lang="it">Segna il telefono come a consumo e Omni-Route lo usa solo quando serve davvero.</p></div>
-      <div class="card"><div class="ico">🔌</div><h3 data-lang="en">An unreliable line</h3><h3 data-lang="it">Una linea inaffidabile</h3>
-        <p data-lang="en">If a connection vanishes, new activity moves to the others by itself.</p>
-        <p data-lang="it">Se una connessione sparisce, le nuove attività passano da sole alle altre.</p></div>
-      <div class="card"><div class="ico">🏢</div><h3 data-lang="en">Busy shared networks</h3><h3 data-lang="it">Reti condivise e affollate</h3>
-        <p data-lang="en">Add your own phone to a crowded Wi-Fi and stop depending on it alone.</p>
-        <p data-lang="it">Aggiungi il tuo telefono a un Wi-Fi affollato e smetti di dipendere da quello soltanto.</p></div>
+      <div class="card"><div class="ico">📥</div>Big downloads
+        Games, films, updates. The file is split in pieces, each one arriving over a different connection.
+        </div>
+      <div class="card"><div class="ico">📞</div>Smooth video calls
+        More connections share the load, so nothing steps on your call.
+        </div>
+      <div class="card"><div class="ico">💼</div>Working from anywhere
+        Holiday house, campsite, train, shared flat: combine what's around you into a connection you can work on.
+        </div>
+      <div class="card"><div class="ico">📱</div>Limited mobile data
+        Mark a phone as metered and Omni-Route uses it only when it truly helps.
+        </div>
+      <div class="card"><div class="ico">🔌</div>An unreliable line
+        If a connection vanishes, new activity moves to the others by itself.
+        </div>
+      <div class="card"><div class="ico">🏢</div>Busy shared networks
+        Add your own phone to a crowded Wi-Fi and stop depending on it alone.
+        </div>
     </div>
-    <p class="fine" data-lang="en">Good to know: a single web page or video still travels through one connection at a time. The gain shows when many things happen together — nearly always — and in big file downloads, which Omni-Route divides across all your connections.</p>
-    <p class="fine" data-lang="it">Da sapere: una singola pagina web o un singolo video viaggiano comunque su una connessione alla volta. Il vantaggio si vede quando succedono tante cose insieme — quasi sempre — e nei download grandi, che Omni-Route divide su tutte le connessioni.</p>
+    Good to know: a single web page or video still travels through one connection at a time. The gain shows when many things happen together — nearly always — and in big file downloads, which Omni-Route divides across all your connections.
+    
   </section>
 
   <!-- ===================== HOW IT WORKS ===================== -->
   <section id="how">
-    <span class="eyebrow" data-lang="en">Under the hood</span><span class="eyebrow" data-lang="it">Sotto il cofano</span>
-    <h2 class="title" data-lang="en">How it works</h2><h2 class="title" data-lang="it">Come funziona</h2>
-    <p class="sub" data-lang="en">Your connections feed Omni-Route. It adds them together and gives every app the combined speed.</p>
-    <p class="sub" data-lang="it">Le tue connessioni alimentano Omni-Route. Lui le somma e dà a ogni app la velocità combinata.</p>
+    Under the hood
+    How it works
+    Your connections feed Omni-Route. It adds them together and gives every app the combined speed.
+    
     <div class="flow" aria-label="Diagram">
       <div class="node"><div class="links3"><span>Ethernet</span><span>Wi-Fi</span><span>Phone 5G (USB)</span></div></div>
       <div class="arrow">→</div>
-      <div class="node core"><b>Omni-Route</b><span data-lang="en">adds them together into one fast connection</span><span data-lang="it">le somma in un'unica connessione veloce</span></div>
+      <div class="node core"><b>Omni-Route</b>adds them together into one fast connection</div>
       <div class="arrow">→</div>
-      <div class="node"><b data-lang="en">Your apps</b><b data-lang="it">Le tue app</b><span data-lang="en">browser · games · calls</span><span data-lang="it">browser · giochi · chiamate</span></div>
+      <div class="node">Your appsbrowser · games · calls</div>
     </div>
     <div class="grid2">
-      <div class="card"><div class="ico">🔀</div><h3 data-lang="en">System mode</h3><h3 data-lang="it">Modalità sistema</h3>
-        <p data-lang="en">A virtual adapter captures your PC's outbound traffic and spreads each new connection across your links, pinned to the chosen network card. One master switch.</p>
-        <p data-lang="it">Un adattatore virtuale cattura il traffico in uscita del PC e distribuisce ogni nuova connessione sui tuoi link, vincolata alla scheda di rete scelta. Un solo interruttore.</p></div>
-      <div class="card"><div class="ico">⚡</div><h3 data-lang="en">File accelerator</h3><h3 data-lang="it">Acceleratore file</h3>
-        <p data-lang="en">Paste a download link: the file is cut into chunks, each fetched over a different connection, resumed exactly after any pause or crash, and verified.</p>
-        <p data-lang="it">Incolla un link: il file viene tagliato in blocchi, ognuno scaricato da una connessione diversa, ripreso al byte dopo ogni pausa o crash, e verificato.</p></div>
+      <div class="card"><div class="ico">🔀</div>System mode
+        A virtual adapter captures your PC's outbound traffic and spreads each new connection across your links, pinned to the chosen network card. One master switch.
+        </div>
+      <div class="card"><div class="ico">⚡</div>File accelerator
+        Paste a download link: the file is cut into chunks, each fetched over a different connection, resumed exactly after any pause or crash, and verified.
+        </div>
     </div>
-    <p class="fine" data-lang="en">Omni-Route is deliberately not "true bonding": without a server on the other side, one connection cannot be split across providers. It delivers most of the practical benefit with zero infrastructure. Windows 10/11 64-bit only; IPv4 in system mode.</p>
-    <p class="fine" data-lang="it">Omni-Route non è volutamente "vero bonding": senza un server dall'altra parte, una singola connessione non si può dividere tra provider. Dà gran parte del beneficio pratico con zero infrastruttura. Solo Windows 10/11 a 64 bit; IPv4 in modalità sistema.</p>
+    Omni-Route is deliberately not "true bonding": without a server on the other side, one connection cannot be split across providers. It delivers most of the practical benefit with zero infrastructure. Windows 10/11 64-bit only; IPv4 in system mode.
+    
   </section>
 
   <!-- ===================== FAQ ===================== -->
   <section id="faq">
     <span class="eyebrow">FAQ</span>
-    <h2 class="title" data-lang="en">Questions</h2><h2 class="title" data-lang="it">Domande</h2>
+    Questions
     <div class="faq">
-      <details><summary><span data-lang="en">Do I need two phones?</span><span data-lang="it">Servono due telefoni?</span></summary>
-        <p data-lang="en">No. One phone plus your Wi-Fi is already two connections. More phones or Wi-Fi networks simply add more speed.</p>
-        <p data-lang="it">No. Un telefono più il tuo Wi-Fi sono già due connessioni. Più telefoni o reti Wi-Fi aggiungono semplicemente altra velocità.</p></details>
-      <details><summary><span data-lang="en">Does it cost anything?</span><span data-lang="it">Costa qualcosa?</span></summary>
-        <p data-lang="en">No. It is free, with no account and no subscription. Your phone's own data plan still applies, of course.</p>
-        <p data-lang="it">No. È gratis, senza account né abbonamento. Il piano dati del tuo telefono, naturalmente, resta quello che è.</p></details>
-      <details><summary><span data-lang="en">Is my traffic sent to someone's server?</span><span data-lang="it">Il mio traffico passa da un server di qualcuno?</span></summary>
-        <p data-lang="en">No. Everything happens on your PC. There is no relay and no cloud: each connection goes out through the phone or Wi-Fi you chose, straight to the website.</p>
-        <p data-lang="it">No. Tutto avviene sul tuo PC. Nessun relay, nessun cloud: ogni connessione esce dal telefono o dal Wi-Fi che hai scelto, direttamente verso il sito.</p></details>
-      <details><summary><span data-lang="en">Will one video or one page load faster?</span><span data-lang="it">Un singolo video o una pagina si caricano più velocemente?</span></summary>
-        <p data-lang="en">A single stream still uses one connection at a time. The gain shows when many things happen together, and in big downloads, which Omni-Route splits across all your connections.</p>
-        <p data-lang="it">Un singolo flusso usa comunque una connessione alla volta. Il vantaggio si vede quando succedono tante cose insieme, e nei download grandi, che Omni-Route divide su tutte le connessioni.</p></details>
-      <details><summary><span data-lang="en">How is it different from Speedify or a bonding VPN?</span><span data-lang="it">Che differenza c’è con Speedify o una VPN di bonding?</span></summary>
-        <p data-lang="en">Bonding services like Speedify send all your traffic through their own servers, usually for a subscription. Omni-Route has no server in between: each connection goes straight to the website. The trade-off: a single stream is not split across connections, while big downloads still are.</p>
-        <p data-lang="it">I servizi di bonding come Speedify fanno passare tutto il traffico dai loro server, di solito con un abbonamento. Omni-Route non ha nessun server in mezzo: ogni connessione va dritta al sito. Il compromesso: un singolo flusso non viene diviso tra le connessioni, i download grandi invece sì.</p></details>
-      <details><summary><span data-lang="en">Does it change anything in Windows?</span><span data-lang="it">Cambia qualcosa in Windows?</span></summary>
-        <p data-lang="en">One thing. Windows normally disconnects your Wi-Fi as soon as you plug in a cable. Omni-Route tells Windows to keep every connection on, so they can add up. Uninstall it and the old setting comes back.</p>
-        <p data-lang="it">Una cosa sola. Di solito Windows stacca il Wi-Fi appena colleghi un cavo. Omni-Route gli dice di tenere accese tutte le connessioni, così possono sommarsi. Se lo disinstalli, torna l'impostazione di prima.</p></details>
-      <details><summary><span data-lang="en">Mac or Linux?</span><span data-lang="it">E su Mac o Linux?</span></summary>
-        <p data-lang="en">Not yet. Omni-Route is Windows 10 and 11 (64-bit) only for now.</p>
-        <p data-lang="it">Non ancora. Per ora Omni-Route funziona solo su Windows 10 e 11 (64 bit).</p></details>
+      <details><summary>Do I need two phones?</summary>
+        No. One phone plus your Wi-Fi is already two connections. More phones or Wi-Fi networks simply add more speed.
+        </details>
+      <details><summary>Does it cost anything?</summary>
+        No. It is free, with no account and no subscription. Your phone's own data plan still applies, of course.
+        </details>
+      <details><summary>Is my traffic sent to someone's server?</summary>
+        No. Everything happens on your PC. There is no relay and no cloud: each connection goes out through the phone or Wi-Fi you chose, straight to the website.
+        </details>
+      <details><summary>Will one video or one page load faster?</summary>
+        A single stream still uses one connection at a time. The gain shows when many things happen together, and in big downloads, which Omni-Route splits across all your connections.
+        </details>
+      <details><summary>How is it different from Speedify or a bonding VPN?</summary>
+        Bonding services like Speedify send all your traffic through their own servers, usually for a subscription. Omni-Route has no server in between: each connection goes straight to the website. The trade-off: a single stream is not split across connections, while big downloads still are.
+        </details>
+      <details><summary>Does it change anything in Windows?</summary>
+        One thing. Windows normally disconnects your Wi-Fi as soon as you plug in a cable. Omni-Route tells Windows to keep every connection on, so they can add up. Uninstall it and the old setting comes back.
+        </details>
+      <details><summary>Mac or Linux?</summary>
+        Not yet. Omni-Route is Windows 10 and 11 (64-bit) only for now.
+        </details>
     </div>
   </section>
 
   <!-- ===================== FINAL CTA ===================== -->
   <div class="final">
-    <h2 data-lang="en">Add up what you already have.</h2><h2 data-lang="it">Somma quello che hai già.</h2>
+    Add up what you already have.
     <div class="dl-row">
       <a class="btn primary lg" href="https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
-        <span data-lang="en">Download installer</span><span data-lang="it">Scarica l'installer</span>
+        Download installer
       </a>
       <a class="btn ghost lg" href="https://github.com/mr-peppermint/Omni-Route">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
-        <span data-lang="en">View on GitHub</span><span data-lang="it">Vedi su GitHub</span>
+        View on GitHub
       </a>
     </div>
     <p class="note" style="margin-top:1rem">Windows 10 · 11 · x64</p>
@@ -496,11 +483,11 @@
   <div class="wrap cols">
     <span>Omni-Route</span>
     <nav aria-label="Footer">
-      <a href="https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe"><span data-lang="en">Download</span><span data-lang="it">Scarica</span></a>
+      <a href="https://github.com/mr-peppermint/Omni-Route/releases/download/v1.0.0/Omni-Route_1.0.0_x64-setup.exe">Download</a>
       <a href="https://github.com/mr-peppermint/Omni-Route">GitHub</a>
-      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/LICENSE"><span data-lang="en">License (PolyForm Shield)</span><span data-lang="it">Licenza (PolyForm Shield)</span></a>
-      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/COMMERCIAL.md"><span data-lang="en">Commercial use</span><span data-lang="it">Uso commerciale</span></a>
-      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/THIRD_PARTY_NOTICES.md"><span data-lang="en">Third-party notices</span><span data-lang="it">Note terze parti</span></a>
+      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/LICENSE">License (PolyForm Shield)</a>
+      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/COMMERCIAL.md">Commercial use</a>
+      <a href="https://github.com/mr-peppermint/Omni-Route/blob/main/THIRD_PARTY_NOTICES.md">Third-party notices</a>
     </nav>
   </div>
 </footer>
@@ -508,25 +495,7 @@
 <script>
   const root = document.documentElement;
   const shot = document.getElementById('shot');
-  function setLang(l) {
-    root.lang = l;
-    document.querySelectorAll('[data-set]').forEach(b => b.classList.toggle('on', b.dataset.set === l));
-    shot.src = l === 'it' ? 'images/dashboard-it.png' : 'images/dashboard-en.png';
-    try { localStorage.setItem('omni-route-site-lang', l); } catch (e) {}
-  }
-  document.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
-  let saved = null; try { saved = localStorage.getItem('omni-route-site-lang'); } catch (e) {}
-  setLang(saved || ((navigator.language || 'en').toLowerCase().startsWith('it') ? 'it' : 'en'));
-
-  document.getElementById('copy').addEventListener('click', async (e) => {
-    const text = document.getElementById('cmd').textContent.replace(/^\$/, '');
-    try { await navigator.clipboard.writeText(text); } catch (err) {
-      const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
-    }
-    const btn = e.currentTarget, prev = btn.innerHTML;
-    btn.textContent = root.lang === 'it' ? 'Copiato ✓' : 'Copied ✓';
-    setTimeout(() => (btn.innerHTML = prev), 1600);
-  });
+  
 </script>
 </body>
 </html>

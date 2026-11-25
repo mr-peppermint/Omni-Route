@@ -1,5 +1,5 @@
 !macro NSIS_HOOK_PREINSTALL
-  DetailPrint "Arresto del servizio Omni-Route esistente"
+  DetailPrint "Stopping existing Omni-Route service"
   nsExec::ExecToLog 'sc.exe stop OmniRouteService'
   ; sc stop ritorna subito: il processo del servizio tiene ancora bloccato
   ; omni-route.exe per qualche istante e in modalità silenziosa (/S) NSIS
@@ -20,12 +20,12 @@
 !macroend
 
 !macro NSIS_HOOK_POSTINSTALL
-  DetailPrint "Configurazione del servizio Omni-Route"
+  DetailPrint "Configuring Omni-Route service"
   nsExec::ExecToStack '"$INSTDIR\omni-route.exe" install-service'
   Pop $0
   Pop $1
   ${If} $0 != 0
-    MessageBox MB_ICONSTOP|MB_OK "Il servizio Omni-Route non è stato installato (codice $0). Reinstalla l'app come amministratore."
+    MessageBox MB_ICONSTOP|MB_OK "The Omni-Route service could not be installed (code $0). Please reinstall the app as administrator."
     Abort
   ${EndIf}
 
@@ -52,19 +52,19 @@
   ; Se il servizio va in crash senza lasciare traccia nel log (es. abort del
   ; processo) Windows salva un minidump locale: resta sul PC, non viene
   ; inviato da nessuna parte, al massimo 3 file.
-  DetailPrint "Abilito i report di crash locali di Omni-Route"
+  DetailPrint "Enabling local crash dumps for Omni-Route"
   WriteRegExpandStr HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\omni-route.exe" "DumpFolder" "%ProgramData%\Omni-Route\crashdumps"
   WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\omni-route.exe" "DumpCount" 3
   WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\omni-route.exe" "DumpType" 1
 !macroend
 
 !macro NSIS_HOOK_PREUNINSTALL
-  DetailPrint "Rimozione del servizio Omni-Route"
+  DetailPrint "Removing Omni-Route service"
   nsExec::ExecToLog '"$INSTDIR\omni-route.exe" remove-service'
   SetRegView 64
   DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\omni-route.exe"
 
-  DetailPrint "Ripristino della gestione connessioni di Windows"
+  DetailPrint "Restoring Windows connection management"
   SetRegView 64
   ClearErrors
   ReadRegStr $2 HKLM "Software\Omni-Route" "WcmMinimizeConnectionsPrevious"

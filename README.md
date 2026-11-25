@@ -10,7 +10,7 @@
 
 Ethernet, Wi-Fi, and USB tethering work together to balance your PC's traffic and accelerate supported downloads.
 
-[Download for Windows](https://github.com/mr-peppermint/Omni-Route/releases/latest) · [How it works](#how-it-works) · [Build from source](#build-from-source) · [Italiano](README.it.md)
+[Download for Windows](https://github.com/mr-peppermint/Omni-Route/releases/latest) · [How it works](#how-it-works) · [Build from source](#build-from-source) · 
 
 <br>
 

@@ -1,13 +1,19 @@
-// Tema chiaro/scuro/di sistema (§6.6 della spec, pannello Aspetto).
-// "Di sistema" = nessun attributo su <html>, l'app.css segue
-// prefers-color-scheme da sola.
-
+// Theme management (system / light / dark)
 export type ThemePreference = "system" | "light" | "dark";
 
 const STORAGE_KEY = "omni-route-theme";
 
 class ThemeStore {
   preference = $state<ThemePreference>(readStored());
+
+  isDark = $derived.by(() => {
+    if (this.preference === "dark") return true;
+    if (this.preference === "light") return false;
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return true;
+  });
 
   constructor() {
     $effect.root(() => {
@@ -23,12 +29,16 @@ class ThemeStore {
   set(pref: ThemePreference) {
     this.preference = pref;
   }
+
+  toggle() {
+    this.set(this.isDark ? "light" : "dark");
+  }
 }
 
 function readStored(): ThemePreference {
-  if (typeof localStorage === "undefined") return "system";
+  if (typeof localStorage === "undefined") return "dark";
   const stored = localStorage.getItem(STORAGE_KEY);
-  return stored === "light" || stored === "dark" ? stored : "system";
+  return stored === "light" || stored === "dark" || stored === "system" ? stored : "dark";
 }
 
 function apply(pref: ThemePreference) {

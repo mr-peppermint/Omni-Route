@@ -36,20 +36,20 @@ impl fmt::Display for OmniRouteError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             OmniRouteError::Win32 { function, code } => {
-                write!(f, "{function} fallita (WIN32_ERROR {code})")
+                write!(f, "{function} failed (WIN32_ERROR {code})")
             }
-            OmniRouteError::Io(e) => write!(f, "errore IO: {e}"),
-            OmniRouteError::Wmi(msg) => write!(f, "errore WMI: {msg}"),
+            OmniRouteError::Io(e) => write!(f, "IO error: {e}"),
+            OmniRouteError::Wmi(msg) => write!(f, "WMI error: {msg}"),
             OmniRouteError::LocationServicesRequired => write!(
                 f,
-                "SSID/segnale non leggibili: attiva Servizi di localizzazione in \
-                 Impostazioni → Privacy e sicurezza → Posizione (richiesto da Windows \
-                 per leggere lo stato Wi-Fi)"
+                "SSID/signal unreadable: enable Location Services in \
+                 Settings → Privacy & Security → Location (required by Windows \
+                 to read Wi-Fi status)"
             ),
             OmniRouteError::Http(msg) => write!(f, "{msg}"),
-            OmniRouteError::Sqlite(msg) => write!(f, "errore database: {msg}"),
-            OmniRouteError::Transport(msg) => write!(f, "errore di trasporto: {msg}"),
-            OmniRouteError::Cancelled => write!(f, "annullato dall'utente"),
+            OmniRouteError::Sqlite(msg) => write!(f, "database error: {msg}"),
+            OmniRouteError::Transport(msg) => write!(f, "transport error: {msg}"),
+            OmniRouteError::Cancelled => write!(f, "cancelled by user"),
         }
     }
 }
@@ -81,14 +81,14 @@ mod tests {
         let e = win32_err("GetAdaptersAddresses", 111);
         assert_eq!(
             e.to_string(),
-            "GetAdaptersAddresses fallita (WIN32_ERROR 111)"
+            "GetAdaptersAddresses failed (WIN32_ERROR 111)"
         );
     }
 
     #[test]
     fn location_services_required_message_mentions_settings_path() {
         let e = OmniRouteError::LocationServicesRequired;
-        assert!(e.to_string().contains("Servizi di localizzazione"));
-        assert!(e.to_string().contains("Posizione"));
+        assert!(e.to_string().contains("Location Services"));
+        assert!(e.to_string().contains("Location"));
     }
 }

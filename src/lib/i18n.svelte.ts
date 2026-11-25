@@ -1,21 +1,14 @@
-// Localizzazione UI (italiano / inglese). La chiave è il testo italiano:
-// `t("Impostazioni")` restituisce "Settings" in inglese. Una chiave senza
-// traduzione ricade sul testo italiano, quindi niente stringa rimane vuota.
-// Placeholder `{nome}` sostituiti dai parametri passati.
-
-export type Language = "it" | "en";
-
-const STORAGE_KEY = "omni-route-language";
+// UI Localization (English)
+export type Language = "en";
 
 const EN: Record<string, string> = {
-  // Barra superiore
+  // Topbar
   "Internet multi-link per Windows": "Multi-link Internet for Windows",
   "Monitor attivo": "Monitor active",
   "Connessione al motore…": "Connecting to engine…",
   "Diagnostica": "Diagnostics",
   "Impostazioni": "Settings",
   "Lingua": "Language",
-  "Italiano": "Italiano",
   "English": "English",
   // App
   "Acceleratore per singoli file": "Single-file accelerator",
@@ -81,7 +74,7 @@ const EN: Record<string, string> = {
   "media {v}": "avg {v}",
   "Usa {name}": "Use {name}",
   "Bilanciamento automatico per flusso. I singoli download cifrati non vengono spezzati; per quelli usa l’acceleratore file qui sotto.": "Automatic per-flow balancing. Individual encrypted downloads are not split; use the file accelerator below for those.",
-  // Tipi di link
+  // Link types
   "Tethering USB": "USB tethering",
   "Altra rete": "Other network",
   "Altro": "Other",
@@ -145,17 +138,17 @@ const EN: Record<string, string> = {
   "https://esempio.it/file.zip": "https://example.com/file.zip",
   "Avvio…": "Starting…",
   "Avvia download": "Start download",
-  // Grafico
+  // Chart
   "1 min": "1 min",
   "5 min": "5 min",
-  // SpeedTest / diagnostica
+  // SpeedTest / Diagnostics
   "La diagnostica non ha risposto entro 20 secondi.": "Diagnostics did not respond within 20 seconds.",
   "Test connessioni": "Connection test",
   "Verifica in corso…": "Checking…",
   "Riprova": "Retry",
   "Ripeti": "Repeat",
   "Nessun link fisico rilevato.": "No physical link detected.",
-  // esiti della diagnostica che arrivano dal backend
+  // Backend diagnostics outcomes
   "OK (binding corretto)": "OK (correct binding)",
   "nessun gateway di default": "no default gateway",
   "nessun IP locale della stessa famiglia": "no local IP of the same family",
@@ -201,13 +194,13 @@ const EN: Record<string, string> = {
   "Salvataggio…": "Saving…",
   "Le modifiche vengono salvate automaticamente.": "Changes are saved automatically.",
   // Accent presets
-  "Cyan e Viola": "Cyan and Violet",
-  "Verde acido e Magenta": "Acid Green and Magenta",
-  "Blu elettrico e Arancio": "Electric Blue and Orange",
-  "Rosa shock e Ciano": "Shock Pink and Cyan",
-  "Giallo acido e Viola": "Acid Yellow and Violet",
-  "Rosso cyber e Blu": "Cyber Red and Blue",
-  // Messaggi amichevoli
+  "Cyan e Viola": "Indigo and Amber",
+  "Verde acido e Magenta": "Emerald and Rose",
+  "Blu elettrico e Arancio": "Sky and Coral",
+  "Rosa shock e Ciano": "Violet and Gold",
+  "Giallo acido e Viola": "Bronze and Teal",
+  "Rosso cyber e Blu": "Crimson and Slate",
+  // Friendly messages
   "Questo sito non permette di dividere il download. Userò una sola connessione: sarà più lento ma il file arriverà corretto.": "This site does not allow splitting the download. I will use a single connection: slower, but the file will arrive intact.",
   "Il link è scaduto. Copia un link nuovo dal sito: riprenderò da dove eravamo, senza ricominciare.": "The link has expired. Copy a fresh link from the site: I will resume where we left off, without starting over.",
   "Una delle connessioni riceve una versione diversa del file. Continuo con le altre per non rovinare il download.": "One connection is receiving a different version of the file. I will carry on with the others so the download is not corrupted.",
@@ -222,44 +215,23 @@ const EN: Record<string, string> = {
   "Due connessioni usano la stessa rete interna e non riesco a tenerle separate. Prova a scollegare un telefono e attivare invece il suo hotspot Wi-Fi. In alternativa userò solo la connessione più veloce.": "Two connections share the same internal network and I cannot keep them apart. Try unplugging a phone and using its Wi-Fi hotspot instead. Otherwise I will use only the fastest connection.",
 };
 
-const DICTIONARIES: Record<Language, Record<string, string>> = { it: {}, en: EN };
-
-function detect(): Language {
-  try {
-    const stored = typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-    if (stored === "it" || stored === "en") return stored;
-  } catch {
-    // localStorage non disponibile: si ricade sulla lingua del sistema.
-  }
-  const nav = typeof navigator !== "undefined" ? navigator.language : "it";
-  return nav.toLowerCase().startsWith("it") ? "it" : "en";
-}
-
 class LanguageStore {
-  current = $state<Language>(detect());
+  readonly current: Language = "en";
 
-  set(language: Language) {
-    this.current = language;
-    try {
-      localStorage.setItem(STORAGE_KEY, language);
-    } catch {
-      // preferenza non persistita, resta valida per la sessione
-    }
-    if (typeof document !== "undefined") document.documentElement.lang = language;
+  set(_language: Language) {
+    // English is the only supported language
   }
 
   get locale(): string {
-    return this.current === "it" ? "it-IT" : "en-US";
+    return "en-US";
   }
 }
 
 export const lang = new LanguageStore();
-if (typeof document !== "undefined") document.documentElement.lang = lang.current;
+if (typeof document !== "undefined") document.documentElement.lang = "en";
 
-/** Traduce `key` (testo italiano) nella lingua corrente. Reattiva: legge
- * `lang.current`, quindi va chiamata dentro template o `$derived`. */
 export function t(key: string, params?: Record<string, string | number>): string {
-  const text = DICTIONARIES[lang.current][key] ?? key;
+  const text = EN[key] ?? key;
   if (!params) return text;
   return text.replace(/\{(\w+)\}/g, (match, name) =>
     name in params ? String(params[name]) : match,

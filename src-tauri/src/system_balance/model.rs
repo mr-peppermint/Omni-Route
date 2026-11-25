@@ -90,7 +90,7 @@ pub struct SystemBalanceStatus {
 
 impl Default for SystemBalanceStatus {
     fn default() -> Self {
-        Self::unavailable("Servizio Omni-Route non raggiungibile")
+        Self::unavailable("Omni-Route service unavailable")
     }
 }
 

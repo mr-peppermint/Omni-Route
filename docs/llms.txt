@@ -26,7 +26,6 @@ What it is not:
 ## Docs
 
 - [README (English)](https://raw.githubusercontent.com/mr-peppermint/Omni-Route/main/README.md): what it does, use cases, how it works, comparison table, limits, install, build from source, security notes
-- [README (Italiano)](https://raw.githubusercontent.com/mr-peppermint/Omni-Route/main/README.it.md): same content in Italian
 - [Changelog](https://raw.githubusercontent.com/mr-peppermint/Omni-Route/main/CHANGELOG.md): release notes
 - [Website](https://mr-peppermint.github.io/Omni-Route/): product page with FAQ (English and Italian)
 

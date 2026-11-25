@@ -14,10 +14,10 @@ pub fn run_doctor() {
     let report = collect_report();
 
     for w in &report.warnings {
-        eprintln!("Avviso: {w}");
+        eprintln!("Warning: {w}");
     }
 
-    println!("Link rilevati:");
+    println!("Detected links:");
     for l in &report.links {
         println!(
             "  [{}] {} — {} — Internet={} — key={} — ip={:?}",
@@ -26,11 +26,11 @@ pub fn run_doctor() {
     }
 
     if report.links.is_empty() {
-        println!("Nessun link fisico rilevato.");
+        println!("No physical links detected.");
         return;
     }
 
-    println!("\nValidazione binding (probe ~5s per gateway noto per link):");
+    println!("\nValidating bindings (~5s probe per known gateway per link):");
     for l in &report.links {
         for p in &l.probes {
             println!(
@@ -46,7 +46,7 @@ pub fn run_doctor() {
 /// persistenza/resume (Milestone 3) né multi-link (Milestone 4) ancora.
 pub fn run_download(args: &[String]) {
     let Some(url) = args.first() else {
-        eprintln!("Uso: omni-route download <URL> [-o <cartella>] [--sha256 <hash>]");
+        eprintln!("Usage: omni-route download <URL> [-o <folder>] [--sha256 <hash>]");
         std::process::exit(2);
     };
 
@@ -64,7 +64,7 @@ pub fn run_download(args: &[String]) {
                 expected_sha256 = args.get(i).cloned();
             }
             other => {
-                eprintln!("Opzione sconosciuta: {other}");
+                eprintln!("Unknown option: {other}");
                 std::process::exit(2);
             }
         }
@@ -79,7 +79,7 @@ pub fn run_download(args: &[String]) {
     let dest = dir.join(file_name);
 
     println!("Download: {url}");
-    println!("Destinazione: {}", dest.display());
+    println!("Destination: {}", dest.display());
 
     let rt = tokio::runtime::Runtime::new().expect("impossibile avviare il runtime async");
     let result = rt.block_on(download_to_file(url, &dest, expected_sha256.as_deref()));
@@ -92,7 +92,7 @@ pub fn run_download(args: &[String]) {
             );
         }
         Err(e) => {
-            eprintln!("Errore: {e}");
+            eprintln!("Error: {e}");
             std::process::exit(1);
         }
     }
@@ -111,7 +111,7 @@ pub fn run_download(args: &[String]) {
 /// ripristinabile usare `omni-route download` (single-link, Milestone 3).
 pub fn run_download_multi(args: &[String]) {
     let Some(url) = args.first() else {
-        eprintln!("Uso: omni-route download-multi <URL> [-o <cartella>] [--sha256 <hash>] [--connections-per-link <N>]");
+        eprintln!("Usage: omni-route download-multi <URL> [-o <folder>] [--sha256 <hash>] [--connections-per-link <N>]");
         std::process::exit(2);
     };
 
@@ -133,12 +133,12 @@ pub fn run_download_multi(args: &[String]) {
                 i += 1;
                 connections_per_link =
                     args.get(i).and_then(|s| s.parse().ok()).unwrap_or_else(|| {
-                        eprintln!("--connections-per-link richiede un numero");
+                        eprintln!("--connections-per-link requires a number");
                         std::process::exit(2);
                     });
             }
             other => {
-                eprintln!("Opzione sconosciuta: {other}");
+                eprintln!("Unknown option: {other}");
                 std::process::exit(2);
             }
         }
@@ -152,14 +152,14 @@ pub fn run_download_multi(args: &[String]) {
         .unwrap_or("download.bin");
     let dest = dir.join(file_name);
 
-    println!("Validazione link (probe ~5s per gateway noto per link)...");
+    println!("Validating links (~5s probe per known gateway per link)...");
     let (report, candidates) = collect_validated_candidates();
     for w in &report.warnings {
-        eprintln!("Avviso: {w}");
+        eprintln!("Warning: {w}");
     }
     if candidates.is_empty() {
         eprintln!(
-            "Nessun link con binding validato: vedi `omni-route doctor` per la diagnosi. Nessun download avviato."
+            "No links with validated binding: run `omni-route doctor` for diagnosis. No download started."
         );
         std::process::exit(1);
     }
@@ -180,12 +180,12 @@ pub fn run_download_multi(args: &[String]) {
         })
         .collect();
 
-    println!("Link usati:");
+    println!("Links used:");
     for l in &links {
-        println!("  {} (x{} connessioni)", l.key, l.connections);
+        println!("  {} (x{} connections)", l.key, l.connections);
     }
     println!("Download: {url}");
-    println!("Destinazione: {}", dest.display());
+    println!("Destination: {}", dest.display());
 
     let db = Arc::new(Mutex::new(
         StateDb::open_in_memory().expect("impossibile aprire lo stato in memoria"),
@@ -207,7 +207,7 @@ pub fn run_download_multi(args: &[String]) {
             );
         }
         Err(e) => {
-            eprintln!("Errore: {e}");
+            eprintln!("Error: {e}");
             std::process::exit(1);
         }
     }

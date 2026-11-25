@@ -12,7 +12,10 @@
     | "wifi"
     | "check"
     | "trash"
-    | "globe";
+    | "globe"
+    | "sun"
+    | "moon"
+    | "chevron-right";
 
   let { name, size = 18 }: { name: IconName; size?: number } = $props();
 </script>
@@ -56,5 +59,12 @@
     <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" />
   {:else if name === "globe"}
     <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.7 3.9 5.7 3.9 9s-1.3 6.3-3.9 9c-2.6-2.7-3.9-5.7-3.9-9S9.4 5.7 12 3Z" />
+  {:else if name === "sun"}
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  {:else if name === "moon"}
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  {:else if name === "chevron-right"}
+    <path d="m9 18 6-6-6-6" />
   {/if}
 </svg>
