@@ -118,7 +118,11 @@ pub fn start_service_elevated() -> io::Result<()> {
         value.encode_utf16().chain(std::iter::once(0)).collect()
     }
     let verb = wide("runas");
-    let file = wide("sc.exe");
+    let system_root = std::env::var_os("SystemRoot")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Windows"));
+    let sc_path = system_root.join("System32").join("sc.exe");
+    let file = wide(&sc_path.to_string_lossy());
     let parameters = wide(&format!("start {}", super::service::SERVICE_NAME));
     // SAFETY: tutte le stringhe sono UTF-16 terminate da zero e restano vive
     // per tutta la durata della chiamata.

@@ -94,6 +94,10 @@ class SystemBalanceStore {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await this.poll();
       }
+      if (!this.status?.serviceAvailable) {
+        const reason = this.status?.lastError ?? "Windows did not report that the service started.";
+        this.startError = `${reason} Check C:\\ProgramData\\Omni-Route\\service.log for details.`;
+      }
     } catch (error) {
       this.startError = String(error);
     } finally {
