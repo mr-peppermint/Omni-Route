@@ -426,7 +426,7 @@
   .live-pill { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--success); font-size: 0.72rem; font-weight: 650; }
   .live-pill span { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: dot-pulse 2.2s ease-in-out infinite; }
 
-  .gauge-card :global(svg) { width: min(300px, 75%); height: auto; margin: -0.2rem auto -0.25rem; }
+  .gauge-card :global(svg) { width: min(356px, 90%); height: auto; margin: 0.15rem auto 0.25rem; }
   .metric-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 -1.2rem; border-top: 1px solid var(--border); background: var(--surface-inset); }
   .metric { min-width: 0; padding: 0.75rem 0.9rem; border-right: 1px solid var(--border); }
   .metric:last-child { border-right: 0; }

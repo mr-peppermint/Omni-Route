@@ -1,48 +1,76 @@
-// Mappatura non lineare valore -> angolo del gauge (§6.3 della spec).
-// Le velocità realistiche coprono due ordini di grandezza (5↔500 Mbps):
-// una scala lineare renderebbe illeggibili i link lenti, quindi log.
+// Network speed meter scale & geometry.
+// Uses a 180° semicircle (180° left → 270° top → 360° right) with evenly spaced
+// standard network landmarks [0, 1, 5, 10, 50, 100, 500, 1,000] Mbps (scaling
+// cleanly to multi-Gbps when aggregated throughput exceeds 1,000 Mbps).
 
-/** Scaletta dei fondoscala (§6.3) — deve combaciare con
- * `metrics::sampler::SCALE_STEPS` lato Rust: è il backend a decidere
- * (con isteresi) quale fondoscala è attivo, il frontend lo riceve già
- * in `StatsSnapshot.scaleMax` e usa questa lista solo per le tacche. */
+/** Scale max steps matching `metrics::sampler::SCALE_STEPS` on the Rust side. */
 export const SCALE_STEPS = [
   10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000,
 ] as const;
 
-/** Geometria dell'arco (§6.3): 270°, da 135° a 405° (0°/360° = destra,
- * in senso orario), apertura in basso. */
-export const ARC_START_DEG = 135;
-export const ARC_END_DEG = 405;
+/** 180° semicircle geometry (0° = right, clockwise in screen coords). */
+export const ARC_START_DEG = 180;
+export const ARC_END_DEG = 360;
 export const ARC_SWEEP_DEG = ARC_END_DEG - ARC_START_DEG;
 
-/** `t = log(1+v) / log(1+scaleMax)`, clampato a [0,1] — un valore oltre
- * il fondoscala corrente (transitorio, prima che l'isteresi lo alzi) non
- * deve mandare l'arco fuori scala. */
+/** Standard Google-style network speed markings up to 1 Gbps. */
+export const DEFAULT_NETWORK_TICKS = [0, 1, 5, 10, 50, 100, 500, 1000] as const;
+
+/** Returns 8 evenly-spaced network landmarks covering `scaleMax`.
+ * Up to 1,000 Mbps, always shows `[0, 1, 5, 10, 50, 100, 500, 1000]`. */
+export function tickValues(scaleMax: number): number[] {
+  if (scaleMax <= 1000) return [...DEFAULT_NETWORK_TICKS];
+  if (scaleMax <= 2500) return [0, 5, 10, 50, 100, 500, 1000, 2500];
+  if (scaleMax <= 5000) return [0, 10, 50, 100, 500, 1000, 2500, 5000];
+  if (scaleMax <= 10000) return [0, 10, 50, 100, 500, 1000, 5000, 10000];
+  if (scaleMax <= 50000) return [0, 50, 100, 500, 1000, 5000, 10000, 50000];
+  if (scaleMax <= 100000) return [0, 100, 500, 1000, 5000, 10000, 50000, 100000];
+  return [0, 500, 1000, 5000, 10000, 50000, 100000, 1000000];
+}
+
+/** Formats landmark tick numbers cleanly (`1,000`, `2.5G`, `10G`, etc.). */
+export function formatTickLabel(value: number): string {
+  if (value === 0) return "0";
+  if (value === 1000) return "1,000";
+  if (value > 1000) {
+    const gbps = value / 1000;
+    return Number.isInteger(gbps) ? `${gbps}G` : `${gbps.toFixed(1)}G`;
+  }
+  return String(value);
+}
+
+/** Piecewise-linear mapping across the network landmarks so each printed tick
+ * sits at an exact uniform angle along the semicircle and speeds align cleanly
+ * with the markings. */
 export function valueToFraction(value: number, scaleMax: number): number {
-  if (scaleMax <= 0) return 0;
-  const t = Math.log(1 + Math.max(0, value)) / Math.log(1 + scaleMax);
-  return Math.min(1, Math.max(0, t));
+  const ticks = tickValues(scaleMax);
+  const v = Math.max(0, value);
+  const maxTick = ticks[ticks.length - 1];
+  if (v <= 0 || maxTick <= 0) return 0;
+  if (v >= maxTick) return 1;
+
+  const segments = ticks.length - 1;
+  for (let i = 0; i < segments; i++) {
+    const lo = ticks[i];
+    const hi = ticks[i + 1];
+    if (v <= hi) {
+      const local = (v - lo) / (hi - lo);
+      return (i + local) / segments;
+    }
+  }
+  return 1;
 }
 
 export function fractionToAngleDeg(fraction: number): number {
-  return ARC_START_DEG + fraction * ARC_SWEEP_DEG;
+  const clamped = Math.min(1, Math.max(0, fraction));
+  return ARC_START_DEG + clamped * ARC_SWEEP_DEG;
 }
 
 export function valueToAngleDeg(value: number, scaleMax: number): number {
   return fractionToAngleDeg(valueToFraction(value, scaleMax));
 }
 
-/** Tacche etichettate ai valori della scaletta interni al fondoscala
- * corrente (§6.3: "Tacche etichettate ai valori della scaletta interni
- * al fondoscala corrente"). */
-export function tickValues(scaleMax: number): number[] {
-  return SCALE_STEPS.filter((s) => s <= scaleMax);
-}
-
-/** Punto cartesiano su un cerchio di raggio `r` centrato nell'origine,
- * per un angolo in gradi nella stessa convenzione di `ARC_START_DEG`
- * (0° = destra, in senso orario — coordinate schermo, Y verso il basso). */
+/** Polar to screen-space Cartesian point (`0°` = right, clockwise). */
 export function polarToCartesian(radius: number, angleDeg: number): { x: number; y: number } {
   const rad = (angleDeg * Math.PI) / 180;
   return { x: radius * Math.cos(rad), y: radius * Math.sin(rad) };

@@ -475,9 +475,9 @@
   .feed.off :global(.gauge > :not(.link-switch)) { opacity: 0.68; }
 
   /* Hub (total gauge) */
-  .hub { position: relative; z-index: 1; grid-column: 3; min-height: 0; height: 100%; aspect-ratio: 1 / 1.08; max-width: 46vw; justify-self: end; }
-  .hub :global(.gauge) { padding: 0.35rem 0.45rem 0.55rem; }
-  .hub :global(svg) { flex: 1 1 auto; min-height: 0; width: 100%; height: 100%; margin: 0 !important; }
+  .hub { position: relative; z-index: 1; grid-column: 3; min-height: 0; height: 100%; aspect-ratio: 1.16 / 1; max-width: 48vw; justify-self: end; }
+  .hub :global(.gauge) { padding: 0.65rem 0.85rem 0.7rem; }
+  .hub :global(svg) { flex: 0 1 auto; min-height: 0; width: 100%; height: auto; max-height: calc(100% - 2.3rem); margin: 0 !important; }
 
   /* ── Flow lines ───────────────────────────────────────────────────── */
   .flows { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: visible; }
