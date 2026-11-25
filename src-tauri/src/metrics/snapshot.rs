@@ -24,6 +24,11 @@ pub struct LinkStats {
     /// escluso dal bilanciamento. È quello che mostra la schermata principale.
     pub live_mbps: f64,
     pub live_avg_mbps: f64,
+    /// Most recent short speed test for this link, kept separate from live traffic.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub speed_test_mbps: Option<f64>,
+    pub speed_test_pending: bool,
+    pub speed_test_attempted: bool,
     pub bytes: u64,
     pub session_bytes: u64,
     pub rtt_ms: Option<f64>,

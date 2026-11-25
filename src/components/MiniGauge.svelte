@@ -14,6 +14,7 @@
     featured = false,
     row = false,
     detail,
+    averageLabel,
     children,
   }: {
     label: string;
@@ -28,6 +29,8 @@
     row?: boolean;
     /** Riga secondaria sotto il nome (solo variante `row`). */
     detail?: string;
+    /** Override per distinguere il throughput testato dalla media live. */
+    averageLabel?: string;
     children?: Snippet;
   } = $props();
 
@@ -97,7 +100,7 @@
     <strong>{label}</strong>
     {#if row}
       <b class="now">{online ? formatMbps(displayed) : "—"}</b>
-      <span>{[detail, online ? t("media {v}", { v: formatMbps(average) }) : ""].filter(Boolean).join(" · ")}</span>
+      <span>{[detail, online ? (averageLabel ?? t("media {v}", { v: formatMbps(average) })) : ""].filter(Boolean).join(" · ")}</span>
     {:else}
       <span>{online ? t("Media {v}", { v: formatMbps(average) }) : featured ? t("Nessuna connessione attiva") : t("Connessione memorizzata")}</span>
     {/if}

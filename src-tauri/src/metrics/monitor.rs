@@ -137,6 +137,19 @@ pub fn spawn(
         let mut last_tick = Instant::now();
         let mut previously_online: std::collections::HashSet<String> =
             std::collections::HashSet::new();
+        let mut speed_test_values: HashMap<String, f64> = HashMap::new();
+        let mut speed_test_pending = std::collections::HashSet::new();
+        let mut speed_test_attempted = std::collections::HashSet::new();
+        let (speed_test_jobs_tx, mut speed_test_jobs_rx) =
+            tokio::sync::mpsc::unbounded_channel::<(String, u32, std::net::IpAddr)>();
+        let (speed_test_results_tx, mut speed_test_results_rx) =
+            tokio::sync::mpsc::unbounded_channel::<(String, Option<f64>)>();
+        tokio::spawn(async move {
+            while let Some((key, if_index, local_ip)) = speed_test_jobs_rx.recv().await {
+                let speed = crate::metrics::speed_test::measure_link_speed(if_index, local_ip).await;
+                let _ = speed_test_results_tx.send((key, speed));
+            }
+        });
         let mut previous_download_state: Option<String> = None;
 
         loop {
@@ -242,6 +255,9 @@ pub fn spawn(
                     peak_mbps: sample.peak_mbps,
                     live_mbps: live.mbps,
                     live_avg_mbps: live.avg_mbps,
+                    speed_test_mbps: speed_test_values.get(&identity.key).copied(),
+                    speed_test_pending: speed_test_pending.contains(&identity.key),
+                    speed_test_attempted: speed_test_attempted.contains(&identity.key),
                     bytes: identity.total_bytes + session_bytes,
                     session_bytes,
                     rtt_ms: None, // non ancora misurato in questo loop (vedi note in testa al file)
@@ -275,6 +291,9 @@ pub fn spawn(
                         peak_mbps: 0.0,
                         live_mbps: 0.0,
                         live_avg_mbps: 0.0,
+                        speed_test_mbps: None,
+                        speed_test_pending: false,
+                        speed_test_attempted: false,
                         bytes: id.total_bytes,
                         session_bytes: 0,
                         rtt_ms: None,
@@ -292,6 +311,49 @@ pub fn spawn(
                 .filter(|l| l.state == "online")
                 .map(|l| l.key.clone())
                 .collect();
+
+            while let Ok((key, result)) = speed_test_results_rx.try_recv() {
+                speed_test_pending.remove(&key);
+                if currently_online.contains(&key) {
+                    speed_test_attempted.insert(key.clone());
+                    if let Some(speed) = result.filter(|value| value.is_finite() && *value > 0.0) {
+                        speed_test_values.insert(key, speed);
+                    } else {
+                        speed_test_values.remove(&key);
+                    }
+                }
+            }
+
+            for key in previously_online.difference(&currently_online) {
+                speed_test_values.remove(key);
+                speed_test_attempted.remove(key);
+            }
+
+            for candidate in &candidates {
+                if !currently_online.contains(&candidate.stable_key)
+                    || speed_test_attempted.contains(&candidate.stable_key)
+                    || speed_test_pending.contains(&candidate.stable_key)
+                {
+                    continue;
+                }
+                let Some(local_ip) = preferred_local_ip(&candidate.ips) else {
+                    continue;
+                };
+                speed_test_pending.insert(candidate.stable_key.clone());
+                let _ = speed_test_jobs_tx.send((
+                    candidate.stable_key.clone(),
+                    candidate.if_index,
+                    local_ip,
+                ));
+            }
+
+            for link in &mut link_stats {
+                let online = currently_online.contains(&link.key);
+                link.speed_test_mbps = speed_test_values.get(&link.key).copied();
+                link.speed_test_pending = online && speed_test_pending.contains(&link.key);
+                link.speed_test_attempted = online && speed_test_attempted.contains(&link.key);
+            }
+
             for l in &link_stats {
                 let was_online = previously_online.contains(&l.key);
                 let is_online = currently_online.contains(&l.key);

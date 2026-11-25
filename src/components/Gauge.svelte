@@ -8,7 +8,7 @@
 
   import { untrack } from "svelte";
   import type { LinkStats } from "../lib/ipc";
-  import { valueToFraction, fractionToAngleDeg, tickValues, polarToCartesian, ARC_START_DEG } from "../lib/scale";
+  import { valueToFraction, fractionToAngleDeg, tickValues, polarToCartesian, ARC_START_DEG, SCALE_STEPS } from "../lib/scale";
   import { formatMbps, formatGainFactor, speedParts } from "../lib/format";
 
   let { links, totalMbps, totalAvgMbps, scaleMax, gainFactor }: {
@@ -33,6 +33,16 @@
   }
 
   const fullTrackPath = $derived(arcPath(RADIUS, 135, 405));
+  const testedTotal = $derived(
+    links
+      .filter((link) => link.state !== "disabled" && link.state !== "offline")
+      .reduce((sum, link) => sum + (link.speedTestMbps ?? 0), 0),
+  );
+  const showingTest = $derived(totalMbps < 0.05 && testedTotal > 0);
+  const displayTotal = $derived(showingTest ? testedTotal : totalMbps);
+  const displayAverage = $derived(showingTest ? testedTotal : totalAvgMbps);
+  const testScale = $derived(SCALE_STEPS.find((step) => step >= displayTotal * 1.15) ?? SCALE_STEPS[SCALE_STEPS.length - 1]);
+  const displayScale = $derived(showingTest ? Math.max(scaleMax, testScale) : scaleMax);
 
   // Animazione: i campioni arrivano a 4Hz, interpoliamo con
   // requestAnimationFrame + easing (~180ms) per un movimento fluido.
@@ -44,7 +54,7 @@
   let animFrame = 0;
 
   $effect(() => {
-    const target = totalMbps;
+    const target = displayTotal;
     if (prefersReducedMotion) {
       displayedTotal = target;
       return;
@@ -77,9 +87,9 @@
     const arcs: { key: string; color: string; d: string }[] = [];
     for (const l of links) {
       if (l.state === "disabled" || l.state === "offline") continue;
-      const startFrac = valueToFraction(cumulative, scaleMax);
-      cumulative += Math.max(0, l.mbps);
-      const endFrac = valueToFraction(cumulative, scaleMax);
+      const startFrac = valueToFraction(cumulative, displayScale);
+      cumulative += Math.max(0, showingTest ? (l.speedTestMbps ?? 0) : l.mbps);
+      const endFrac = valueToFraction(cumulative, displayScale);
       const startDeg = fractionToAngleDeg(startFrac);
       const endDeg = fractionToAngleDeg(endFrac);
       arcs.push({ key: l.key, color: l.color, d: arcPath(RADIUS, startDeg, endDeg) });
@@ -87,12 +97,12 @@
     return arcs;
   });
 
-  const needleAngle = $derived(fractionToAngleDeg(valueToFraction(displayedTotal, scaleMax)));
+  const needleAngle = $derived(fractionToAngleDeg(valueToFraction(displayedTotal, displayScale)));
   const needleTip = $derived(polarToCartesian(RADIUS, needleAngle));
 
   const ticks = $derived(
-    tickValues(scaleMax).map((v) => {
-      const angle = fractionToAngleDeg(valueToFraction(v, scaleMax));
+    tickValues(displayScale).map((v) => {
+      const angle = fractionToAngleDeg(valueToFraction(v, displayScale));
       const inner = polarToCartesian(RADIUS - TRACK_WIDTH / 2 - 4, angle);
       const outer = polarToCartesian(RADIUS + TRACK_WIDTH / 2 + 4, angle);
       const label = polarToCartesian(RADIUS + TRACK_WIDTH / 2 + 18, angle);
@@ -117,7 +127,9 @@
   viewBox="0 0 {SIZE} {SIZE}"
   role="img"
   aria-label={hasActiveLinks
-    ? t("Velocità totale {total}, media {avg}, {gain}", { total: formatMbps(totalMbps), avg: formatMbps(totalAvgMbps), gain: formatGainFactor(gainFactor) })
+    ? showingTest
+      ? t("Velocità testata {total}", { total: formatMbps(displayTotal) })
+      : t("Velocità totale {total}, media {avg}, {gain}", { total: formatMbps(displayTotal), avg: formatMbps(displayAverage), gain: formatGainFactor(gainFactor) })
     : t("Nessuna connessione attiva")}
   class:paused={!hasActiveLinks}
 >
@@ -172,7 +184,9 @@
   </text>
   {#if hasActiveLinks}
     <text x={CENTER} y={CENTER + 38} text-anchor="middle" class="center-gain">
-      {t("{name} · media {avg}", { name: singleLinkName ?? formatGainFactor(gainFactor), avg: avgLabel(totalAvgMbps) })}
+      {showingTest
+        ? t("Risultato speed test")
+        : t("{name} · media {avg}", { name: singleLinkName ?? formatGainFactor(gainFactor), avg: avgLabel(displayAverage) })}
     </text>
   {/if}
 </svg>

@@ -26,14 +26,20 @@
   function liveOf(link: { key: string; mbps: number; avgMbps: number }) {
     const measured = monitor.snapshot?.links.find((entry) => entry.key === link.key);
     return measured && measured.state !== "offline" && typeof measured.liveMbps === "number"
-      ? { mbps: measured.liveMbps, avg: measured.liveAvgMbps }
-      : { mbps: link.mbps, avg: link.avgMbps };
+      ? {
+          mbps: measured.liveMbps,
+          avg: measured.liveAvgMbps,
+          test: measured.speedTestMbps ?? null,
+          testPending: measured.speedTestPending,
+          testAttempted: measured.speedTestAttempted,
+        }
+      : { mbps: link.mbps, avg: link.avgMbps, test: null, testPending: false, testAttempted: false };
   }
   const live = $derived(new Map(feedLinks.map((link) => [link.key, liveOf(link)])));
   const totalNow = $derived([...live.values()].reduce((sum, rate) => sum + rate.mbps, 0));
   const totalAvg = $derived([...live.values()].reduce((sum, rate) => sum + rate.avg, 0));
   const scaleMax = $derived.by(() => {
-    const peak = Math.max(totalNow, ...[...live.values()].map((rate) => rate.mbps), 0);
+    const peak = Math.max(totalNow, ...[...live.values()].map((rate) => Math.max(rate.mbps, rate.test ?? 0)), 0);
     return SCALE_STEPS.find((step) => step >= peak * 1.15) ?? SCALE_STEPS[SCALE_STEPS.length - 1];
   });
   const palette = ["#8b7cf8", "#d4954a", "#74b98a", "#c47ab5", "#6aaed4", "#d47a7a"];
@@ -41,6 +47,20 @@
   function linkColor(key: string) {
     const index = Math.max(0, feedLinks.findIndex((link) => link.key === key));
     return monitor.snapshot?.links.find((link) => link.key === key)?.color ?? palette[index % palette.length];
+  }
+
+  function meterValue(key: string) {
+    const rate = live.get(key);
+    return rate ? (rate.mbps >= 0.05 ? rate.mbps : rate.test ?? 0) : 0;
+  }
+
+  function meterAverageLabel(key: string) {
+    const rate = live.get(key);
+    if (!rate || rate.mbps >= 0.05) return undefined;
+    if (rate.test != null) return t("Ultimo speed test: {v}", { v: formatMbps(rate.test) });
+    if (rate.testPending) return t("Test velocità in corso…");
+    if (rate.testAttempted) return t("Test velocità non disponibile");
+    return undefined;
   }
 
   function stateLabel() {
@@ -241,8 +261,9 @@
                 row
                 label={link.name}
                 detail={link.enabled ? `${kindLabel(link.kind)} · ${link.localIp}` : `${kindLabel(link.kind)} · ${t("Esclusa")}`}
-                value={live.get(link.key)?.mbps ?? 0}
+                value={meterValue(link.key)}
                 average={live.get(link.key)?.avg ?? 0}
+                averageLabel={meterAverageLabel(link.key)}
                 {scaleMax}
                 color={linkColor(link.key)}
                 online={link.state !== "offline"}

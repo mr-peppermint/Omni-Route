@@ -23,6 +23,9 @@ export type LinkStats = {
   /** traffico reale della scheda, misurato sempre (anche a tunnel fermo) */
   liveMbps: number;
   liveAvgMbps: number;
+  speedTestMbps?: number;
+  speedTestPending: boolean;
+  speedTestAttempted: boolean;
   bytes: number;
   sessionBytes: number;
   rttMs: number | null;

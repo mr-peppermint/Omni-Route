@@ -75,6 +75,16 @@
       <dd>{formatMbps(link.avgMbps)}</dd>
       <dt>{t("Picco sessione")}</dt>
       <dd>{formatMbps(link.peakMbps)}</dd>
+      {#if link.speedTestPending}
+        <dt>{t("Ultimo speed test")}</dt>
+        <dd>{t("Test velocità in corso…")}</dd>
+      {:else if link.speedTestMbps != null}
+        <dt>{t("Ultimo speed test")}</dt>
+        <dd>{formatMbps(link.speedTestMbps)}</dd>
+      {:else if link.speedTestAttempted}
+        <dt>{t("Ultimo speed test")}</dt>
+        <dd>{t("Test velocità non disponibile")}</dd>
+      {/if}
       {#if link.rttMs != null}
         <dt>RTT</dt>
         <dd>{formatRtt(link.rttMs)}</dd>

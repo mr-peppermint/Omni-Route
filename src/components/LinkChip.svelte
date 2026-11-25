@@ -10,6 +10,8 @@
   let requestedEnabled = $state<boolean | null>(null);
   const effectiveEnabled = $derived(requestedEnabled ?? link.enabled);
   const visibleState = $derived(!effectiveEnabled && link.state !== "offline" ? "disabled" : link.state);
+  const showingSpeedTest = $derived(link.mbps < 0.05 && (link.speedTestMbps ?? 0) > 0);
+  const displayedSpeed = $derived(showingSpeedTest ? link.speedTestMbps! : link.mbps);
 
   $effect(() => {
     if (requestedEnabled !== null && link.enabled === requestedEnabled) requestedEnabled = null;
@@ -63,8 +65,18 @@
         <span class="rate-current">{formatMbps(0)}</span>
         <span class="rate-average">{t("Esclusa dal download")}</span>
       {:else}
-        <span class="rate-current">{formatMbps(link.mbps)}</span>
-        <span class="rate-average">{t("media {v}", { v: formatMbps(link.avgMbps) })}</span>
+        <span class="rate-current">{formatMbps(displayedSpeed)}</span>
+        <span class="rate-average">
+          {#if showingSpeedTest}
+            {t("Ultimo speed test")}
+          {:else if link.speedTestPending}
+            {t("Test velocità in corso…")}
+          {:else if link.speedTestAttempted && link.speedTestMbps == null}
+            {t("Test velocità non disponibile")}
+          {:else}
+            {t("media {v}", { v: formatMbps(link.avgMbps) })}
+          {/if}
+        </span>
       {/if}
     </span>
   </button>
