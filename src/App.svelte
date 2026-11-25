@@ -70,9 +70,9 @@
 <main class="shell">
   <header class="topbar">
     <div class="brand-lockup">
-      <!-- Animated logo mark -->
+      <!-- Two links converging into one connection -->
       <span class="brand-mark" class:connected={monitor.connected}>
-        <Icon name="activity" size={18} />
+        <img src="/brand-mark.svg" alt="" />
         <span class="brand-pulse"></span>
       </span>
       <div>
@@ -303,12 +303,11 @@
     position: relative;
     width: 32px; height: 32px;
     display: grid; place-items: center;
-    color: var(--accent);
-    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
     border-radius: 9px;
-    background: color-mix(in srgb, var(--accent) 8%, var(--surface-1));
+    overflow: visible;
     transition: box-shadow 300ms ease, border-color 300ms ease;
   }
+  .brand-mark img { display: block; width: 100%; height: 100%; border-radius: inherit; }
   .brand-mark.connected {
     border-color: color-mix(in srgb, var(--success) 40%, transparent);
     box-shadow: 0 0 10px color-mix(in srgb, var(--success) 14%, transparent);
