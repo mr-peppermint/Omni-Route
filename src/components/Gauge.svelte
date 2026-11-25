@@ -51,30 +51,34 @@
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let displayedTotal = $state(0);
+  let targetTotal = $state(0);
   let animFrame = 0;
 
   $effect(() => {
-    const target = displayTotal;
+    targetTotal = displayTotal;
+  });
+
+  $effect(() => {
     if (prefersReducedMotion) {
-      displayedTotal = target;
+      displayedTotal = targetTotal;
       return;
     }
-    // `untrack`: leggere `displayedTotal` qui senza tracciarlo è
-    // essenziale — `step()` sotto lo scrive a ogni frame; se l'effect
-    // dipendesse anche da `displayedTotal` (oltre che da `totalMbps`) si
-    // ri-innescherebbe da solo a ogni frame, azzerando `startTime` prima
-    // che l'interpolazione possa mai progredire (il numero resta fermo
-    // vicino al valore iniziale — bug osservato: gauge fermo a 0 mentre
-    // il grafico sotto, che non ha questo loop, si muove correttamente).
-    const start = untrack(() => displayedTotal);
-    const startTime = performance.now();
-    const DURATION = 180;
+    // Smooth the actual gauge value, not just the pointer. Rises follow
+    // quickly; drops settle more slowly so normal 4 Hz sampling jitter does
+    // not make the fill visibly chatter. The current value is preserved when
+    // a new sample arrives, so an update never restarts from the old target.
+    let lastTime = performance.now();
     cancelAnimationFrame(animFrame);
     function step(now: number) {
-      const t = Math.min(1, (now - startTime) / DURATION);
-      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-      displayedTotal = start + (target - start) * eased;
-      if (t < 1) animFrame = requestAnimationFrame(step);
+      const elapsed = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+      const target = untrack(() => targetTotal);
+      const current = untrack(() => displayedTotal);
+      const settlingTime = target > current ? 0.14 : 0.42;
+      const fraction = 1 - Math.exp(-elapsed / settlingTime);
+      const next = current + (target - current) * fraction;
+      displayedTotal = Math.abs(target - next) < 0.02 ? target : next;
+      if (Math.abs(target - next) >= 0.02) animFrame = requestAnimationFrame(step);
     }
     animFrame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(animFrame);
@@ -88,7 +92,10 @@
     for (const l of links) {
       if (l.state === "disabled" || l.state === "offline") continue;
       const startFrac = valueToFraction(cumulative, displayScale);
-      cumulative += Math.max(0, showingTest ? (l.speedTestMbps ?? 0) : l.mbps);
+      const rawTotal = Math.max(0, displayTotal);
+      const linkSpeed = Math.max(0, showingTest ? (l.speedTestMbps ?? 0) : l.mbps);
+      // Keep the stacked link colors aligned with the smoothed total endpoint.
+      cumulative += rawTotal > 0 ? (linkSpeed / rawTotal) * displayedTotal : 0;
       const endFrac = valueToFraction(cumulative, displayScale);
       const startDeg = fractionToAngleDeg(startFrac);
       const endDeg = fractionToAngleDeg(endFrac);
@@ -109,6 +116,22 @@
       return { v, inner, outer, label };
     }),
   );
+  const majorTickFractions = $derived(
+    ticks.map((tick) => valueToFraction(tick.v, displayScale)),
+  );
+  const minorTicks = $derived.by(() => {
+    const marks: { inner: { x: number; y: number }; outer: { x: number; y: number } }[] = [];
+    for (let i = 1; i < 20; i += 1) {
+      const fraction = i / 20;
+      if (majorTickFractions.some((major) => Math.abs(major - fraction) < 0.014)) continue;
+      const angle = fractionToAngleDeg(fraction);
+      marks.push({
+        inner: polarToCartesian(RADIUS - TRACK_WIDTH / 2 - 2, angle),
+        outer: polarToCartesian(RADIUS + TRACK_WIDTH / 2 + 2, angle),
+      });
+    }
+    return marks;
+  });
 
   function avgLabel(mbps: number) {
     const p = speedParts(mbps);
@@ -141,6 +164,19 @@
     stroke-linecap="round"
   />
 
+  {#each minorTicks as tick}
+    <line
+      x1={CENTER + tick.inner.x}
+      y1={CENTER + tick.inner.y}
+      x2={CENTER + tick.outer.x}
+      y2={CENTER + tick.outer.y}
+      stroke="var(--gauge-tick)"
+      stroke-width="1"
+      stroke-linecap="round"
+      class="minor-tick"
+    />
+  {/each}
+
   {#each stackedArcs as arc (arc.key)}
     <path d={arc.d} fill="none" stroke={arc.color} stroke-width={TRACK_WIDTH} stroke-linecap="butt" />
   {/each}
@@ -152,7 +188,8 @@
       x2={CENTER + tick.outer.x}
       y2={CENTER + tick.outer.y}
       stroke="var(--gauge-tick)"
-      stroke-width="1"
+      stroke-width="1.5"
+      stroke-linecap="round"
     />
     <text
       x={CENTER + tick.label.x}
@@ -203,6 +240,7 @@
   }
   .center-unit { font-size: 13px; fill: var(--text-muted); }
   .center-gain { font-size: 11px; fill: var(--text-subtle); }
+  .minor-tick { opacity: 0.62; }
 
   .needle-glow {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 55%, transparent));
