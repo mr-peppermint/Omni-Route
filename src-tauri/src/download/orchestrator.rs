@@ -20,12 +20,14 @@
 use crate::core::errors::OmniRouteError;
 use crate::download::chunk::segment_size_bytes;
 use crate::download::circuit_breaker::CircuitBreaker;
+use crate::download::http_client::{empty_body, empty_request, send_via_connector_with_retry};
 use crate::download::probe::probe;
 use crate::download::scheduler::Scheduler;
 use crate::download::worker::{run_worker, WorkerContext};
 use crate::network::connector::LinkConnector;
 use crate::storage::{sha256_of_file, FileWriter, StateDb};
 use hyper::Uri;
+use http_body_util::BodyExt;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
@@ -126,12 +128,6 @@ pub async fn multi_link_download_with_handle(
     let total = pr.total_size.ok_or_else(|| {
         OmniRouteError::Http("dimensione sconosciuta: multi-link richiede Content-Length".into())
     })?;
-    if !pr.supports_ranges {
-        return Err(OmniRouteError::Http(
-            "il server non supporta Range: usare il downloader a link singolo (resumable_download)"
-                .into(),
-        ));
-    }
     if total == 0 {
         return Err(OmniRouteError::Http(
             "file vuoto: nulla da schedulare".into(),
@@ -144,8 +140,13 @@ pub async fn multi_link_download_with_handle(
         .map_err(|e| OmniRouteError::Http(format!("URL finale non valido: {e}")))?;
     let dest_str = dest.to_string_lossy().to_string();
 
-    let initial_segment_size =
-        segment_size_bytes(BOOTSTRAP_EWMA_BPS, Duration::from_millis(BOOTSTRAP_RTT_MS)).min(total);
+    let initial_segment_size = if pr.supports_ranges {
+        segment_size_bytes(BOOTSTRAP_EWMA_BPS, Duration::from_millis(BOOTSTRAP_RTT_MS)).min(total)
+    } else {
+        // A server that ignores Range can still be downloaded through one
+        // stream. Use one scheduler segment so the regular progress UI works.
+        total
+    };
 
     let scheduler = Scheduler::new(total, initial_segment_size);
     let segment_ranges: Vec<(u64, u64)> = scheduler
@@ -202,6 +203,29 @@ pub async fn multi_link_download_with_handle(
             link_enabled: link_enabled.clone(),
             state: state.clone(),
         });
+    }
+
+    if !pr.supports_ranges {
+        let connector = links
+            .iter()
+            .find(|link| link.enabled)
+            .map(|link| link.connector)
+            .ok_or_else(|| OmniRouteError::Http("nessun link abilitato per il download".into()))?;
+        return download_single_stream(
+            connector,
+            &uri,
+            total,
+            download_id,
+            dest,
+            &db,
+            &writer,
+            &scheduler,
+            &paused,
+            &cancelled,
+            &state,
+            expected_sha256,
+        )
+        .await;
     }
 
     let mut handles = Vec::new();
@@ -314,6 +338,98 @@ pub async fn multi_link_download_with_handle(
         bytes_written: total,
         sha256_hex,
     })
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn download_single_stream(
+    connector: LinkConnector,
+    uri: &Uri,
+    total: u64,
+    download_id: i64,
+    dest: &Path,
+    db: &Arc<Mutex<StateDb>>,
+    writer: &Arc<FileWriter>,
+    scheduler: &Arc<Mutex<Scheduler>>,
+    paused: &Arc<std::sync::atomic::AtomicBool>,
+    cancelled: &Arc<std::sync::atomic::AtomicBool>,
+    state: &Arc<Mutex<DownloadRunState>>,
+    expected_sha256: Option<&str>,
+) -> Result<MultiLinkOutcome, OmniRouteError> {
+    use hyper::{Method, StatusCode};
+    let build_request = || {
+        empty_request(Method::GET, uri)?
+            .body(empty_body())
+            .map_err(|e| OmniRouteError::Http(e.to_string()))
+    };
+    let result = async {
+        let response = send_via_connector_with_retry(&connector, uri, build_request).await?;
+        if response.status() != StatusCode::OK {
+            return Err(OmniRouteError::Http(format!(
+                "attesa risposta 200 per il download, ricevuto {}",
+                response.status()
+            )));
+        }
+
+        let mut body = response.into_body();
+        let mut offset = 0u64;
+        while let Some(frame) = body.frame().await {
+            while paused.load(std::sync::atomic::Ordering::Acquire) {
+                if cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                    return Err(OmniRouteError::Cancelled);
+                }
+                tokio::time::sleep(Duration::from_millis(100)).await;
+            }
+            if cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                return Err(OmniRouteError::Cancelled);
+            }
+            let frame = frame.map_err(|e| OmniRouteError::Http(format!("errore di streaming: {e}")))?;
+            if let Some(bytes) = frame.data_ref() {
+                if bytes.len() as u64 > total.saturating_sub(offset) {
+                    return Err(OmniRouteError::Http(
+                        "il server ha inviato più byte della dimensione dichiarata".into(),
+                    ));
+                }
+                writer.write_at(offset, bytes)?;
+                offset = offset.saturating_add(bytes.len() as u64);
+                scheduler.lock().unwrap().report_progress(0, offset.min(total));
+            }
+        }
+        if offset != total {
+            return Err(OmniRouteError::Http(format!(
+                "scaricati {offset} byte, attesi {total}: risposta troncata"
+            )));
+        }
+        writer.sync()?;
+        scheduler.lock().unwrap().complete(0);
+        *state.lock().unwrap() = DownloadRunState::Verifying;
+        db.lock().unwrap().mark_download_status(download_id, "verifying")?;
+        let sha256_hex = sha256_of_file(dest)?;
+        if let Some(expected) = expected_sha256 {
+            if !expected.eq_ignore_ascii_case(&sha256_hex) {
+                return Err(OmniRouteError::Http(format!(
+                    "SHA-256 non corrisponde: atteso {expected}, ottenuto {sha256_hex}"
+                )));
+            }
+        }
+        db.lock().unwrap().set_actual_sha256(download_id, &sha256_hex)?;
+        db.lock().unwrap().mark_download_status(download_id, "done")?;
+        *state.lock().unwrap() = DownloadRunState::Done;
+        crate::core::events::push("info", format!("Download completato: {}", dest.display()));
+        Ok(MultiLinkOutcome { download_id, bytes_written: offset, sha256_hex })
+    }
+    .await;
+
+    if let Err(error) = &result {
+        if matches!(error, OmniRouteError::Cancelled) {
+            *state.lock().unwrap() = DownloadRunState::Cancelled;
+            db.lock().unwrap().mark_download_status(download_id, "paused").ok();
+        } else {
+            *state.lock().unwrap() = DownloadRunState::Error(error.to_string());
+            db.lock().unwrap().mark_download_status(download_id, "failed").ok();
+            crate::core::events::push("error", format!("Download fallito: {error}"));
+        }
+    }
+    result
 }
 
 #[cfg(test)]

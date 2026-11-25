@@ -185,7 +185,7 @@
   {#if hasActiveLinks}
     <text x={CENTER} y={CENTER + 38} text-anchor="middle" class="center-gain">
       {showingTest
-        ? t("Risultato speed test")
+        ? t("Speed test · max 10 MB per link")
         : t("{name} · media {avg}", { name: singleLinkName ?? formatGainFactor(gainFactor), avg: avgLabel(displayAverage) })}
     </text>
   {/if}

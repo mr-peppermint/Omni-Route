@@ -1,11 +1,8 @@
 <script lang="ts">
   import { lang, t } from "../lib/i18n.svelte";
-  // Pulsante [🔍 Test] della barra superiore (§6.2). **Semplificazione
-  // nota**: un vero speed test dedicato (`metrics/benchmark.rs` del file
-  // tree della spec) non è stato implementato — questo riusa la
-  // validazione empirica del binding (`doctor`, già reale e già misura
-  // un trasferimento di prova per link, §4.3) invece di un benchmark di
-  // throughput puro separato. Rimandato a M7.
+  // The diagnostics dialog checks interface binding with a small local probe.
+  // The automatic per-link throughput check runs separately when a link comes
+  // online and is shown in the speed meters.
 
   import { doctorReport, type DoctorReport } from "../lib/ipc";
 

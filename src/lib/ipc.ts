@@ -46,6 +46,7 @@ export type DownloadStats = {
   segmentsTotal: number;
   retries: number;
   state: DownloadRunState;
+  message?: string;
 };
 
 export type RecentEvent = { ts: number; level: string; text: string };

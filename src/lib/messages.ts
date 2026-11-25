@@ -11,6 +11,18 @@ export type FriendlyMessage = {
 
 const PATTERNS: { test: RegExp; message: FriendlyMessage }[] = [
   {
+    test: /attesa risposta 200.*ricevuto/i,
+    message: { text: "Il server ha restituito una risposta inattesa. Controlla che il link punti direttamente al file." },
+  },
+  {
+    test: /scaricati \d+ byte, attesi \d+|risposta troncata/i,
+    message: { text: "Il download si è interrotto prima di completarsi. Controlla la connessione e riprova." },
+  },
+  {
+    test: /errore di streaming|transport error|timeout di connessione|connessione fallita/i,
+    message: { text: "La connessione al file è stata interrotta. Controlla la rete e riprova." },
+  },
+  {
     test: /atteso 206.*ricevuto 200|risorsa probabilmente cambiata/i,
     message: {
       text: "Questo sito non permette di dividere il download. Userò una sola connessione: sarà più lento ma il file arriverà corretto.",

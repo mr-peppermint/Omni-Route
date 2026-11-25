@@ -18,7 +18,7 @@ const EN: Record<string, string> = {
   "Riepilogo velocità": "Speed summary",
   "Traffico combinato": "Combined traffic",
   "Velocità in tempo reale": "Real-time speed",
-  "Risultato speed test": "Speed test result",
+  "Speed test · max 10 MB per link": "Speed test · up to 10 MB per link",
   "Velocità testata {total}": "Tested speed {total}",
   "Live": "Live",
   "Media 10 s": "10 s average",

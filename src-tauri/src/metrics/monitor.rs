@@ -449,19 +449,21 @@ fn download_stats(handle: &DownloadHandle) -> DownloadStats {
         .map(|t| (downloaded as f64 / t as f64) * 100.0)
         .unwrap_or(0.0);
 
-    let state_str = match &*handle.state.lock().unwrap() {
+    let state = handle.state.lock().unwrap();
+    let (state_str, message) = match &*state {
         DownloadRunState::Running => {
             if handle.paused.load(std::sync::atomic::Ordering::Relaxed) {
-                "paused"
+                ("paused", None)
             } else {
-                "running"
+                ("running", None)
             }
         }
-        DownloadRunState::Verifying => "verifying",
-        DownloadRunState::Done => "done",
-        DownloadRunState::Error(_) => "error",
-        DownloadRunState::Cancelled => "cancelled",
+        DownloadRunState::Verifying => ("verifying", None),
+        DownloadRunState::Done => ("done", None),
+        DownloadRunState::Error(message) => ("error", Some(message.clone())),
+        DownloadRunState::Cancelled => ("cancelled", None),
     };
+    drop(state);
 
     DownloadStats {
         name: handle.name.clone(),
@@ -473,5 +475,6 @@ fn download_stats(handle: &DownloadHandle) -> DownloadStats {
         segments_total,
         retries,
         state: state_str.to_string(),
+        message,
     }
 }

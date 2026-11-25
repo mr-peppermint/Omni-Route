@@ -50,6 +50,8 @@ pub struct DownloadStats {
     pub segments_total: u32,
     pub retries: u32,
     pub state: String, // "running" | "paused" | "verifying" | "done" | "error"
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

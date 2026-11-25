@@ -160,16 +160,12 @@ async fn start_download(
     for w in &report.warnings {
         tracing::warn!("{w}");
     }
-    if candidates.is_empty() {
-        return Err("No links with validated binding. Check Diagnostics.".into());
-    }
-
     let settings = Settings::load(&state.settings_path)?;
     let connections = settings.resolved_max_connections();
 
     // Le connessioni nuove sono abilitate automaticamente; un'eventuale
     // esclusione manuale resta persistente nel registro.
-    let links: Vec<LinkSpec> = {
+    let mut links: Vec<LinkSpec> = {
         let reg = state.registry.lock().unwrap();
         candidates
             .iter()
@@ -188,6 +184,17 @@ async fn start_download(
             })
             .collect()
     };
+    // Downloads remain usable on ordinary single-link setups, even if no
+    // adapter passed the multi-link binding probe. Multi-link is still used
+    // whenever validated adapters are available.
+    if links.is_empty() {
+        links.push(LinkSpec {
+            key: "system-default".into(),
+            connector: LinkConnector::Plain,
+            enabled: true,
+            connections: 1,
+        });
+    }
     if !links.iter().any(|link| link.enabled) {
         return Err(
             "No connections enabled. Re-enable at least one connection in Settings before downloading.".into(),
@@ -199,26 +206,46 @@ async fn start_download(
     } else {
         PathBuf::from(&settings.download_directory)
     };
-    let file_name = url
-        .rsplit('/')
-        .find(|s| !s.is_empty())
-        .unwrap_or("download.bin");
+    std::fs::create_dir_all(&dest_dir).map_err(|e| format!("Cannot create download folder: {e}"))?;
+    let file_name = download_file_name(&url);
     let dest = dest_dir.join(file_name);
 
     let db = Arc::new(Mutex::new(
         StateDb::open_in_memory().map_err(|e| e.to_string())?,
     ));
     let (tx, rx) = tokio::sync::oneshot::channel();
+    let (error_tx, error_rx) = tokio::sync::oneshot::channel();
     let url_owned = url.clone();
     tauri::async_runtime::spawn(async move {
-        let _ = multi_link_download_with_handle(db, &url_owned, &dest, None, links, Some(tx)).await;
+        if let Err(error) =
+            multi_link_download_with_handle(db, &url_owned, &dest, None, links, Some(tx)).await
+        {
+            tracing::error!("Download failed: {error}");
+            let _ = error_tx.send(error.to_string());
+        }
     });
 
-    let handle = rx
-        .await
-        .map_err(|_| "avvio del download fallito".to_string())?;
+    let handle = tokio::select! {
+        result = rx => result.map_err(|_| "Download startup ended before it was ready.".to_string())?,
+        result = error_rx => return Err(result.unwrap_or_else(|_| "Download could not be started.".into())),
+    };
     *state.active_download.lock().unwrap() = Some(handle);
     Ok(())
+}
+
+fn download_file_name(url: &str) -> String {
+    let path = url
+        .parse::<hyper::Uri>()
+        .ok()
+        .and_then(|uri| uri.path_and_query().map(|path| path.path().to_string()))
+        .unwrap_or_default();
+    let segment = path.rsplit('/').find(|part| !part.is_empty()).unwrap_or("");
+    let safe: String = segment
+        .chars()
+        .map(|ch| if ch.is_control() || "<>:\"|?*\\/".contains(ch) { '_' } else { ch })
+        .collect();
+    let safe = safe.trim_matches(|ch| ch == '.' || ch == ' ');
+    if safe.is_empty() { "download.bin".into() } else { safe.into() }
 }
 
 #[tauri::command]

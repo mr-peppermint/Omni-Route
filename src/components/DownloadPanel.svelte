@@ -3,6 +3,7 @@
   import type { DownloadStats } from "../lib/ipc";
   import { pauseDownload, resumeDownload, cancelDownload, openDownloadFolder } from "../lib/ipc";
   import { formatBytesOf, formatPercent, formatDuration, formatMbps } from "../lib/format";
+  import { friendlyMessage } from "../lib/messages";
   import Icon from "./Icon.svelte";
 
   let {
@@ -77,6 +78,8 @@
       <span>{t("Circa")} <strong>{formatDuration(etaSec)}</strong> {t("rimanenti")}</span>
     {/if}
   </div>
+
+  {#if download.message}<p class="action-error" role="alert">{friendlyMessage(download.message).text}</p>{/if}
 
   {#if actionError}<p class="action-error" role="alert">{actionError}</p>{/if}
 
