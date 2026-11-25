@@ -1,14 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
   <rect x="4" y="4" width="120" height="120" rx="28" fill="#171615"/>
-  <g stroke="#F4F1EC" stroke-linecap="round" stroke-width="7">
-    <path d="M24 30C5 49 5 79 24 98"/>
-    <path d="M40 43c-13 12-13 30 0 42"/>
-    <path d="M45 54c-8 6-8 14 0 20"/>
-    <path d="M104 30c19 19 19 49 0 68"/>
-    <path d="M88 43c13 12 13 30 0 42"/>
-    <path d="M83 54c8 6 8 14 0 20"/>
+  <g fill="none" stroke-linecap="round" stroke-width="7">
+    <g stroke="#E8E1D2">
+      <path d="M27.2 27.2A52 52 0 0 0 27.2 100.8"/>
+      <path d="M37.1 37.1A38 38 0 0 0 37.1 90.9"/>
+      <path d="M47 47A24 24 0 0 0 47 81"/>
+    </g>
+    <g stroke="#E8E1D2">
+      <path d="M100.8 27.2A52 52 0 0 1 100.8 100.8"/>
+      <path d="M90.9 37.1A38 38 0 0 1 90.9 90.9"/>
+      <path d="M81 47A24 24 0 0 1 81 81"/>
+    </g>
   </g>
-  <g transform="rotate(90 64 64) translate(49.6 49.6) scale(1.2)" stroke="#F4F1EC" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.2">
+  <g transform="rotate(135 64 64) translate(49.6 49.6) scale(1.2)" stroke="#C9C1B2" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.2">
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.71"/>
   </g>
