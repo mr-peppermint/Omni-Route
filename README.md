@@ -14,10 +14,6 @@ Ethernet, Wi-Fi, and USB tethering work together to balance your PC's traffic an
 
 <br>
 
-<img src="docs/images/dashboard-en.png" alt="Omni-Route dashboard showing connected links and live network speeds" width="900">
-
-<br>
-
 [![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-24314A?style=flat-square&logo=windows&logoColor=white)](https://github.com/mr-peppermint/Omni-Route)
 [![Release v1.0.0](https://img.shields.io/badge/Release-v1.0.0-6A63D8?style=flat-square)](https://github.com/mr-peppermint/Omni-Route/releases)
 [![PolyForm Shield 1.0.0](https://img.shields.io/badge/License-PolyForm%20Shield-24314A?style=flat-square)](LICENSE)
