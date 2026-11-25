@@ -43,8 +43,8 @@ const EN: Record<string, string> = {
   "Scansione non riuscita": "Scan failed",
   // SystemBalancePanel
   "Servizio non disponibile": "Service unavailable",
-  "Il servizio Omni-Route è fermo.": "The Omni-Route service is stopped.",
-  "Le connessioni vengono rilevate dal servizio di sistema: finché è fermo l'elenco resta vuoto.": "Connections are detected by the system service: while it is stopped the list stays empty.",
+  "Il servizio Omni-Route è fermo.": "The Omni-Route system service is unavailable.",
+  "Le connessioni vengono rilevate dal servizio di sistema: finché è fermo l'elenco resta vuoto.": "The connection list appears after the system service starts. Starting it may ask for administrator approval.",
   "Avvia servizio": "Start service",
   "In attesa del servizio Omni-Route…": "Waiting for the Omni-Route service…",
   "Tutto il PC è bilanciato": "The whole PC is balanced",
