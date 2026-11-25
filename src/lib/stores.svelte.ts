@@ -96,7 +96,7 @@ class SystemBalanceStore {
       }
       if (!this.status?.serviceAvailable) {
         const reason = this.status?.lastError ?? "Windows did not report that the service started.";
-        this.startError = `${reason} Check C:\\ProgramData\\Omni-Route\\service.log for details.`;
+        this.startError = `${reason} Check Event Viewer > Windows Logs > System. The app log at C:\\ProgramData\\Omni-Route\\service.log is created only after logging starts.`;
       }
     } catch (error) {
       this.startError = String(error);
