@@ -228,6 +228,14 @@
     <div class="system-error" role="alert">
       <Icon name="activity" size={17} />
       <div><strong>{errorTitle()}</strong><span>{status.lastError}</span></div>
+      <button
+        class="error-retry"
+        type="button"
+        disabled={systemBalance.busy}
+        onclick={() => void systemBalance.startTunnel()}
+      >
+        {systemBalance.busy ? t("Attivazione in corso…") : t("Riprova tunnel")}
+      </button>
     </div>
   {/if}
 
@@ -418,6 +426,14 @@
   .system-error strong { font-size: 0.8rem; }
   .system-error span { margin-top: 0.15rem; color: var(--text-muted); font-size: 0.72rem; }
   .system-error > div { flex: 1 1 auto; min-width: 0; }
+  .error-retry {
+    flex: none; align-self: center; padding: 0.38rem 0.72rem;
+    border: 1px solid color-mix(in srgb, var(--error) 42%, transparent);
+    border-radius: 7px; background: transparent;
+    color: var(--error); font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+  }
+  .error-retry:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 10%, transparent); }
+  .error-retry:disabled { opacity: 0.5; cursor: default; }
   /* ── Stage: feeds | flows | hub ───────────────────────────────────── */
   .stage {
     position: relative; flex: 1 1 auto; min-height: 0;

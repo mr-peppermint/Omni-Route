@@ -50,6 +50,7 @@ const EN: Record<string, string> = {
   "Avvia servizio": "Start service",
   "Avvia tunnel": "Start tunnel",
   "Arresta tunnel": "Stop tunnel",
+  "Riprova tunnel": "Retry tunnel",
   "In attesa del servizio Omni-Route…": "Waiting for the Omni-Route service…",
   "Tutto il PC è bilanciato": "The whole PC is balanced",
   "Attivazione in corso…": "Activating…",
