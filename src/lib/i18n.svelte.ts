@@ -48,6 +48,8 @@ const EN: Record<string, string> = {
   "Il servizio Omni-Route è fermo.": "The Omni-Route system service is unavailable.",
   "Le connessioni vengono rilevate dal servizio di sistema: finché è fermo l'elenco resta vuoto.": "The connection list appears after the system service starts. Starting it may ask for administrator approval.",
   "Avvia servizio": "Start service",
+  "Avvia tunnel": "Start tunnel",
+  "Arresta tunnel": "Stop tunnel",
   "In attesa del servizio Omni-Route…": "Waiting for the Omni-Route service…",
   "Tutto il PC è bilanciato": "The whole PC is balanced",
   "Attivazione in corso…": "Activating…",

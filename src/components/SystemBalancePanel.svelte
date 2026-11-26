@@ -200,21 +200,22 @@
     <div class="master-control">
       <span class="control-state">{stateLabel()}</span>
       <button
-        class="master-switch"
-        class:on={status?.enabled}
+        class="tunnel-action"
+        class:running={status?.enabled}
         type="button"
-        role="switch"
-        aria-checked={status?.enabled ?? false}
-        aria-label={t("Bilanciamento di sistema")}
-        disabled={!status?.serviceAvailable || systemBalance.busy}
-        onclick={() => void systemBalance.toggle(!(status?.enabled ?? false))}
+        disabled={systemBalance.busy}
+        onclick={() => status?.enabled ? void systemBalance.toggle(false) : void systemBalance.startTunnel()}
       >
-        <span></span>
+        {systemBalance.busy
+          ? t("Attivazione in corso…")
+          : status?.enabled
+            ? t("Arresta tunnel")
+            : t("Avvia tunnel")}
       </button>
     </div>
   </div>
 
-  {#if status && !status.serviceAvailable}
+  {#if !status || !status.serviceAvailable}
     <div class="system-error" role="alert">
       <Icon name="activity" size={17} />
       <div>
@@ -222,9 +223,6 @@
         <span>{t("Le connessioni vengono rilevate dal servizio di sistema: finché è fermo l'elenco resta vuoto.")}</span>
         {#if systemBalance.startError}<span>{systemBalance.startError}</span>{/if}
       </div>
-      <button class="service-start" type="button" onclick={() => void systemBalance.startService()} disabled={systemBalance.busy}>
-        {t("Avvia servizio")}
-      </button>
     </div>
   {:else if status?.lastError}
     <div class="system-error" role="alert">
@@ -389,33 +387,23 @@
   h1 { margin: 0.25rem 0 0.22rem; font-size: clamp(1.15rem, 2.1vw, 1.55rem); line-height: 1.12; letter-spacing: -0.03em; }
   p { margin: 0; color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
 
-  /* ── Master switch ────────────────────────────────────────────────── */
+  /* ── Tunnel action ────────────────────────────────────────────────── */
   .master-control { flex: 0 0 auto; display: grid; justify-items: end; gap: 0.4rem; }
   .control-state { color: var(--text-muted); font-size: 0.73rem; font-weight: 650; }
-  .master-switch, .link-switch {
+  .link-switch {
     position: relative; border: 0; cursor: pointer;
     transition: background 180ms ease;
   }
-  .master-switch {
-    width: 58px; height: 32px; border-radius: 16px;
-    background: var(--surface-3);
-    box-shadow: inset 0 0 0 1px var(--border-strong);
+  .tunnel-action {
+    min-width: 126px; padding: 0.55rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border-strong));
+    border-radius: 9px; background: var(--accent); color: white;
+    font: inherit; font-size: 0.76rem; font-weight: 700; cursor: pointer;
+    transition: filter 140ms ease, opacity 140ms ease;
   }
-  .master-switch span {
-    position: absolute; top: 4px; left: 4px;
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--text-muted);
-    box-shadow: 0 2px 6px rgba(0,0,0,.3);
-    transition: transform 200ms cubic-bezier(.2,.8,.2,1), background 180ms ease;
-  }
-  .master-switch.on {
-    background: linear-gradient(135deg,
-      color-mix(in srgb, var(--success) 80%, var(--accent) 20%),
-      color-mix(in srgb, var(--success) 65%, var(--surface-1)));
-    box-shadow: 0 0 10px color-mix(in srgb, var(--success) 20%, transparent);
-  }
-  .master-switch.on span { transform: translateX(26px); background: white; }
-  .master-switch:disabled { opacity: 0.44; cursor: default; }
+  .tunnel-action.running { background: var(--surface-3); color: var(--text); }
+  .tunnel-action:hover:not(:disabled) { filter: brightness(1.08); }
+  .tunnel-action:disabled { opacity: 0.58; cursor: default; }
 
   /* ── Error banner ─────────────────────────────────────────────────── */
   .system-error {
@@ -430,16 +418,6 @@
   .system-error strong { font-size: 0.8rem; }
   .system-error span { margin-top: 0.15rem; color: var(--text-muted); font-size: 0.72rem; }
   .system-error > div { flex: 1 1 auto; min-width: 0; }
-  .service-start {
-    flex: none; align-self: center; padding: 0.3rem 0.72rem;
-    border: 1px solid color-mix(in srgb, var(--error) 42%, transparent);
-    border-radius: 7px; background: transparent;
-    color: var(--error); font-size: 0.72rem; font-weight: 600; cursor: pointer;
-    transition: background 120ms ease;
-  }
-  .service-start:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 10%, transparent); }
-  .service-start:disabled { opacity: 0.5; cursor: default; }
-
   /* ── Stage: feeds | flows | hub ───────────────────────────────────── */
   .stage {
     position: relative; flex: 1 1 auto; min-height: 0;

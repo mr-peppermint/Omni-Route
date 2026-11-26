@@ -79,29 +79,30 @@ class SystemBalanceStore {
     }
   }
 
-  /** Messaggio dell'ultimo tentativo di avvio del servizio non riuscito
-   * (es. richiesta UAC annullata). */
   startError = $state<string | null>(null);
 
-  async startService() {
+  /** Starts the service if needed and persists the tunnel's enabled state. */
+  async startTunnel() {
     if (this.busy) return;
     this.busy = true;
     this.startError = null;
     try {
-      await startSystemService();
-      // il servizio impiega qualche secondo ad aprire il canale di controllo
-      for (let attempt = 0; attempt < 10 && !this.status?.serviceAvailable; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await this.poll();
+      if (!this.status?.serviceAvailable) {
+        await startSystemService();
+        for (let attempt = 0; attempt < 10 && !this.status?.serviceAvailable; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await this.poll();
+        }
       }
       if (!this.status?.serviceAvailable) {
-        const reason = this.status?.lastError ?? "Windows did not report that the service started.";
-        this.startError = `${reason} Check Event Viewer > Windows Logs > System. The app log at C:\\ProgramData\\Omni-Route\\service.log is created only after logging starts.`;
+        throw new Error(this.status?.lastError ?? "The Omni-Route service did not become available.");
       }
+      this.status = await setSystemBalanceEnabled(true);
     } catch (error) {
       this.startError = String(error);
     } finally {
       this.busy = false;
+      await this.poll();
     }
   }
 
