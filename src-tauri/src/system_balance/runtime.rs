@@ -384,12 +384,16 @@ async fn run_tunnel(
         .mtu(1500)
         .up()
         .platform_config(|platform| {
-            platform.wintun_file(wintun_path);
+            platform.wintun_file(wintun_path.clone());
             platform.wait_for_interfaces(true, false, Duration::from_secs(10));
         });
 
-    let device = tun::create_as_async(&configuration)
-        .map_err(|error| io::Error::other(format!("Wintun: {error}")))?;
+    let device = tun::create_as_async(&configuration).map_err(|error| {
+        io::Error::other(format!(
+            "Wintun failed to load {}: {error}",
+            wintun_path.display()
+        ))
+    })?;
     let if_index = device
         .tun_index()
         .map_err(|error| io::Error::other(format!("indice adattatore: {error}")))?
@@ -618,18 +622,32 @@ where
 
 fn wintun_path() -> io::Result<PathBuf> {
     let executable = std::env::current_exe()?;
-    let path = executable
+    let executable_dir = executable
         .parent()
-        .unwrap_or_else(|| std::path::Path::new("."))
-        .join("wintun.dll");
-    if path.is_file() {
-        Ok(path)
-    } else {
-        Err(io::Error::new(
-            io::ErrorKind::NotFound,
-            format!("wintun.dll non trovato accanto a {}", executable.display()),
-        ))
-    }
+        .unwrap_or_else(|| std::path::Path::new("."));
+
+    // Tauri installs bundled resources under `$INSTDIR\\resources`, while
+    // development builds and portable copies commonly keep the DLL beside
+    // the executable. The system service runs from the same executable, so
+    // resolve both locations from `current_exe` rather than the service's
+    // working directory (normally System32).
+    let candidates = [
+        executable_dir.join("wintun.dll"),
+        executable_dir.join("resources").join("wintun.dll"),
+    ];
+    candidates
+        .iter()
+        .find(|path| path.is_file())
+        .cloned()
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                format!(
+                    "wintun.dll not found beside {} or in its resources directory",
+                    executable.display()
+                ),
+            )
+        })
 }
 
 fn redact_error(error: &io::Error) -> String {
